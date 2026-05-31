@@ -1,0 +1,551 @@
+/* ====================================================
+   ESTILOS DEL DASHBOARD
+   ================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+}
+
+/* ====================================================
+   CONTENEDOR PRINCIPAL
+   ================================================== */
+
+.dashboard-container {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dashboard-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+/* ====================================================
+   HEADER DEL DASHBOARD
+   ================================================== */
+
+.dashboard-header {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #0056B3;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.dashboard-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0;
+}
+
+/* Botón Logout */
+.btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #E53935 0%, #c62828 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+}
+
+.btn-logout:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4);
+}
+
+.btn-logout:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-logout:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ====================================================
+   CONTENIDO DEL DASHBOARD
+   ================================================== */
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+/* ====================================================
+   TARJETA DE USUARIO
+   ================================================== */
+
+.user-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in;
+  border-top: 4px solid #0056B3;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #0056B3 0%, #003d82 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
+}
+
+.user-avatar svg {
+  width: 32px;
+  height: 32px;
+}
+
+.card-title-group {
+  flex: 1;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1F2937;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 13px;
+  color: #9CA3AF;
+}
+
+/* ====================================================
+   INFORMACIÓN DEL USUARIO
+   ================================================== */
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #6B7280;
+}
+
+.info-icon {
+  color: #0056B3;
+  flex-shrink: 0;
+}
+
+.info-value {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1F2937;
+  padding-left: 28px;
+  position: relative;
+}
+
+/* Badge para Rol */
+.role-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #0056B3 0%, #003d82 100%);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+/* Badge para Estado */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.status-badge.status-activo {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.status-badge.status-inactivo {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}
+
+.status-badge.status-bloqueado {
+  background-color: #FEF3C7;
+  color: #92400E;
+}
+
+.status-badge.status-desconocido {
+  background-color: #E5E7EB;
+  color: #374151;
+}
+
+/* ====================================================
+   TARJETA DE BIENVENIDA
+   ================================================== */
+
+.welcome-card {
+  background: linear-gradient(135deg, #002B5B 0%, #003B73 50%, #004a8a 100%);
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in 0.1s both;
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(229, 57, 53, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 12px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.6;
+  margin: 0 0 12px 0;
+}
+
+.welcome-text.secondary {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.welcome-text strong {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+/* ====================================================
+   LOADING Y ERROR
+   ================================================== */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 18px;
+  color: #6B7280;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.error-container {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px;
+  border-left: 4px solid #EF4444;
+  color: #DC2626;
+  font-size: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ====================================================
+   RESPONSIVE DESIGN
+   ================================================== */
+
+@media (max-width: 1024px) {
+  .dashboard-wrapper {
+    padding: 25px 15px;
+  }
+
+  .dashboard-header {
+    padding: 25px;
+    margin-bottom: 30px;
+  }
+
+  .dashboard-title {
+    font-size: 26px;
+  }
+
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .user-card {
+    padding: 25px;
+  }
+
+  .welcome-card {
+    padding: 25px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-wrapper {
+    padding: 20px 15px;
+  }
+
+  .dashboard-header {
+    padding: 20px;
+    margin-bottom: 25px;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-title {
+    font-size: 24px;
+  }
+
+  .btn-logout {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dashboard-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .user-card {
+    padding: 20px;
+  }
+
+  .card-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+  }
+
+  .card-title {
+    font-size: 18px;
+  }
+
+  .welcome-card {
+    padding: 20px;
+  }
+
+  .welcome-title {
+    font-size: 18px;
+  }
+
+  .welcome-text {
+    font-size: 13px;
+  }
+
+  .user-avatar {
+    width: 50px;
+    height: 50px;
+  }
+
+  .user-avatar svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-wrapper {
+    padding: 15px 12px;
+  }
+
+  .dashboard-header {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+  }
+
+  .dashboard-title {
+    font-size: 20px;
+  }
+
+  .btn-logout {
+    font-size: 13px;
+    padding: 8px 14px;
+    width: 100%;
+  }
+
+  .user-card {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .welcome-card {
+    padding: 15px;
+    border-radius: 10px;
+  }
+
+  .card-header {
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    margin-bottom: 2px;
+  }
+
+  .card-subtitle {
+    font-size: 12px;
+  }
+
+  .welcome-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  .welcome-text {
+    font-size: 12px;
+    margin-bottom: 8px;
+  }
+
+  .user-avatar {
+    width: 45px;
+    height: 45px;
+  }
+
+  .user-avatar svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .info-label {
+    font-size: 11px;
+  }
+
+  .info-value {
+    font-size: 14px;
+    padding-left: 24px;
+  }
+
+  .role-badge,
+  .status-badge {
+    font-size: 12px;
+  }
+
+  .dashboard-content {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 320px) {
+  .dashboard-title {
+    font-size: 18px;
+  }
+
+  .card-title {
+    font-size: 15px;
+  }
+
+  .welcome-title {
+    font-size: 15px;
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .user-avatar svg {
+    width: 20px;
+    height: 20px;
+  }
+}
