@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, Mail, Shield, CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -12,8 +15,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Cargar datos del usuario desde localStorage
-    const storedUser = localStorage.getItem('user');
+    // Cargar datos del usuario desde sessionStorage
+    const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       try {
         setUser(JSON.parse(storedUser));
@@ -32,16 +35,16 @@ export default function Dashboard() {
       // Llamar al endpoint de logout
       await api.post('/logout');
 
-      // Limpiar localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Limpiar sessionStorage
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
 
       // Redirigir a login
       navigate('/login');
     } catch (err) {
-      // Incluso si hay error, limpiar localStorage y redirigir
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
+      // Incluso si hay error, limpiar sessionStorage y redirigir
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
       navigate('/login');
     } finally {
       setLoggingOut(false);
@@ -65,27 +68,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-wrapper">
-        {/* Header */}
-        <div className="dashboard-header">
-          <div className="header-content">
-            <h1 className="dashboard-title">Panel del Sistema CUP</h1>
-            <button
-              onClick={handleLogout}
-              disabled={loggingOut}
-              className="btn-logout"
-            >
-              <LogOut size={18} />
-              {loggingOut ? 'Cerrando sesión...' : 'Cerrar sesión'}
-            </button>
-          </div>
-        </div>
+    <div className="app-shell">
+      <Sidebar />
+      <main className="main-content">
+        <Header title="Panel del Sistema CUP" breadcrumb="Inicio / Dashboard" />
 
-        {/* Contenido Principal */}
-        <div className="dashboard-content">
-          {/* Tarjeta de Usuario */}
-          <div className="user-card">
+        <div className="content-inner">
+          <div className="user-card card">
             <div className="card-header">
               <div className="user-avatar">
                 <User size={40} />
@@ -96,9 +85,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Información del Usuario */}
             <div className="user-info">
-              {/* Nombre */}
               <div className="info-item">
                 <div className="info-label">
                   <User size={20} className="info-icon" />
@@ -107,7 +94,6 @@ export default function Dashboard() {
                 <p className="info-value">{user?.name || 'N/A'}</p>
               </div>
 
-              {/* Email */}
               <div className="info-item">
                 <div className="info-label">
                   <Mail size={20} className="info-icon" />
@@ -116,44 +102,33 @@ export default function Dashboard() {
                 <p className="info-value">{user?.email || 'N/A'}</p>
               </div>
 
-              {/* Rol */}
               <div className="info-item">
                 <div className="info-label">
                   <Shield size={20} className="info-icon" />
                   <span>Rol</span>
                 </div>
-                <p className="info-value role-badge">
-                  {user?.role || 'N/A'}
-                </p>
+                <p className="info-value role-badge">{user?.role || 'N/A'}</p>
               </div>
 
-              {/* Estado */}
               <div className="info-item">
                 <div className="info-label">
                   <CheckCircle size={20} className="info-icon" />
                   <span>Estado</span>
                 </div>
-                <p className={`info-value status-badge status-${user?.estado?.toLowerCase() || 'desconocido'}`}>
-                  {user?.estado || 'N/A'}
-                </p>
+                <p className={`info-value status-badge status-${user?.estado?.toLowerCase() || 'desconocido'}`}>{user?.estado || 'N/A'}</p>
               </div>
             </div>
           </div>
 
-          {/* Tarjeta de Bienvenida */}
-          <div className="welcome-card">
+          <div className="welcome-card card">
             <div className="welcome-content">
               <h3 className="welcome-title">Bienvenido al Sistema de Admisión CUP</h3>
-              <p className="welcome-text">
-                Has iniciado sesión correctamente como <strong>{user?.role}</strong>.
-              </p>
-              <p className="welcome-text secondary">
-                Desde aquí podrás acceder a todas las funcionalidades del sistema según tu rol de usuario.
-              </p>
+              <p className="welcome-text">Has iniciado sesión correctamente como <strong>{user?.role}</strong>.</p>
+              <p className="welcome-text secondary">Desde aquí podrás acceder a todas las funcionalidades del sistema según tu rol de usuario.</p>
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

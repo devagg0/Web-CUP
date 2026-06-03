@@ -1,25 +1,43 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Usuarios from './pages/Usuarios';
 import ProtectedRoute from './components/ProtectedRoute';
+import { validateToken } from './services/auth';
 
 function App() {
-  // Redirigir raíz a login o dashboard según autenticación
   const RootRedirect = () => {
-    const token = localStorage.getItem('token');
-    return <Navigate to={token ? '/dashboard' : '/login'} replace />;
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      let mounted = true;
+      const token = sessionStorage.getItem('token');
+
+      if (!token) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      validateToken().then((ok) => {
+        if (!mounted) return;
+        if (ok) navigate('/dashboard', { replace: true });
+        else navigate('/login', { replace: true });
+      });
+
+      return () => {
+        mounted = false;
+      };
+    }, [navigate]);
+
+    return null;
   };
 
   return (
     <BrowserRouter>
       <Routes>
-        {/* Ruta raíz */}
         <Route path="/" element={<RootRedirect />} />
-
-        {/* Ruta de Login */}
         <Route path="/login" element={<Login />} />
-
-        {/* Ruta protegida de Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -28,8 +46,14 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Ruta 404 - redirigir a login o dashboard */}
+        <Route
+          path="/usuarios"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <Usuarios />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

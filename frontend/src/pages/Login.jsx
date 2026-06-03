@@ -57,9 +57,9 @@ export default function Login() {
       });
 
       if (response.data && response.data.token) {
-        // Guardar token y user en localStorage
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // Guardar token y user en sessionStorage
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
 
         // Redirigir al dashboard
         navigate('/dashboard');
