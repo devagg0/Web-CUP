@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios';
 import Carreras from './pages/Carreras';
+import Materias from './pages/Materias';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
@@ -60,6 +61,14 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <Carreras />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/materias"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <Materias />
             </ProtectedRoute>
           }
         />

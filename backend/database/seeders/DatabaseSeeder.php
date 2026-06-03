@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             CarreraSeeder::class,
+            MateriaSeeder::class,
         ]);
     }
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, Grid, BookOpen } from 'lucide-react';
+import { Users, Grid, BookOpen, Layers } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
@@ -28,6 +28,9 @@ export default function Sidebar() {
             </NavLink>
             <NavLink to="/carreras" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <BookOpen size={18} /> <span>Carreras y Cupos</span>
+            </NavLink>
+            <NavLink to="/materias" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <Layers size={18} /> <span>Materias del CUP</span>
             </NavLink>
           </>
         )}

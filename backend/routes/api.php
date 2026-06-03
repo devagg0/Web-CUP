@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,6 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/carreras-activas', [CarreraController::class, 'activas']);
+    Route::get('/materias-activas', [MateriaController::class, 'activas']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -30,6 +32,15 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('/carreras/{carrera}', [CarreraController::class, 'update']);
     Route::patch('/carreras/{carrera}/estado', [CarreraController::class, 'updateEstado']);
     Route::delete('/carreras/{carrera}', [CarreraController::class, 'destroy']);
+
+    // Rutas de Materias
+    Route::get('/materias', [MateriaController::class, 'index']);
+    Route::post('/materias', [MateriaController::class, 'store']);
+    Route::get('/materias/resumen', [MateriaController::class, 'resumen']);
+    Route::get('/materias/{materia}', [MateriaController::class, 'show']);
+    Route::put('/materias/{materia}', [MateriaController::class, 'update']);
+    Route::patch('/materias/{materia}/estado', [MateriaController::class, 'updateEstado']);
+    Route::delete('/materias/{materia}', [MateriaController::class, 'destroy']);
 });
 
 Route::get('/ping', function () {
