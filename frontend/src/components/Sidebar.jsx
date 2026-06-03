@@ -1,6 +1,6 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Users, Grid } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Users, Grid, BookOpen } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
@@ -18,13 +18,18 @@ export default function Sidebar() {
       </div>
 
       <nav className="sidebar-nav">
-        <Link to="/dashboard" className="nav-link">
+        <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <Grid size={18} /> <span>Dashboard</span>
-        </Link>
+        </NavLink>
         {user?.role === 'admin' && (
-          <Link to="/usuarios" className="nav-link">
-            <Users size={18} /> <span>Usuarios y Roles</span>
-          </Link>
+          <>
+            <NavLink to="/usuarios" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <Users size={18} /> <span>Usuarios y Roles</span>
+            </NavLink>
+            <NavLink to="/carreras" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <BookOpen size={18} /> <span>Carreras y Cupos</span>
+            </NavLink>
+          </>
         )}
       </nav>
 

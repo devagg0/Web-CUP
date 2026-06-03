@@ -1,0 +1,167 @@
+.sidebar-nav .nav-link.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.carrera-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  width: min(100%, 760px);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  flex: 1 1 320px;
+  min-width: 220px;
+}
+
+.filter-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 16px;
+  color: #0f2742;
+  background: transparent;
+}
+
+.filter-group svg {
+  color: #6b7280;
+  min-width: 20px;
+}
+
+.carreras-table-wrapper {
+  overflow-x: auto;
+}
+
+.carreras-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 980px;
+}
+
+.carreras-table th,
+.carreras-table td {
+  padding: 18px 14px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.carreras-table thead th {
+  background: transparent;
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+}
+
+.carreras-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(0, 86, 179, 0.05), rgba(0, 86, 179, 0.02));
+}
+
+.cupo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  color: #fff;
+  min-width: 64px;
+  text-align: center;
+}
+
+.cupo-badge.success {
+  background: #16a34a;
+}
+
+.cupo-badge.warning {
+  background: #f59e0b;
+}
+
+.cupo-badge.danger {
+  background: #d92d2d;
+}
+
+.btn-new {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.btn-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-loading {
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.field-error {
+  margin-top: 8px;
+  color: #d92d2d;
+  font-size: 13px;
+}
+
+.message.success {
+  background: #edfaf3;
+  border: 1px solid #d1f4de;
+  color: #0f5132;
+}
+
+.message.error {
+  background: #fff1f0;
+  border: 1px solid #f5c2c7;
+  color: #842029;
+}
+
+@media (max-width: 900px) {
+  .filter-group {
+    width: 100%;
+  }
+
+  .carrera-filters {
+    gap: 10px;
+  }
+
+  .carreras-table {
+    min-width: 760px;
+  }
+}
+
+@media (max-width: 640px) {
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-new,
+  .btn-ghost,
+  .filters select {
+    width: 100%;
+  }
+
+  .table-actions {
+    justify-content: center;
+  }
+}

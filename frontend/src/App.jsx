@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-route
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios';
+import Carreras from './pages/Carreras';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
@@ -51,6 +52,14 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <Usuarios />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/carreras"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <Carreras />
             </ProtectedRoute>
           }
         />

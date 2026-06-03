@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,6 +10,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/carreras-activas', [CarreraController::class, 'activas']);
 });
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
@@ -19,6 +21,15 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/users/{user}/estado', [UserController::class, 'updateEstado']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::get('/roles', [UserController::class, 'roles']);
+
+    // Rutas de Carreras
+    Route::get('/carreras', [CarreraController::class, 'index']);
+    Route::post('/carreras', [CarreraController::class, 'store']);
+    Route::get('/carreras/resumen', [CarreraController::class, 'resumen']);
+    Route::get('/carreras/{carrera}', [CarreraController::class, 'show']);
+    Route::put('/carreras/{carrera}', [CarreraController::class, 'update']);
+    Route::patch('/carreras/{carrera}/estado', [CarreraController::class, 'updateEstado']);
+    Route::delete('/carreras/{carrera}', [CarreraController::class, 'destroy']);
 });
 
 Route::get('/ping', function () {

@@ -7,6 +7,7 @@
 .sidebar-nav { margin-top:28px; display:flex; flex-direction:column; gap:10px; }
 .nav-link { color:#cfe6ff; padding:12px 14px; border-radius:10px; display:flex; gap:10px; align-items:center; text-decoration:none; font-size:15px; transition:background 0.2s ease; }
 .nav-link:hover { background:rgba(255,255,255,0.08); }
+.nav-link.active { background:rgba(255,255,255,0.14); }
 .sidebar-footer { margin-top:24px; }
 .user-mini { display:flex; gap:12px; align-items:center; }
 .avatar { width:44px; height:44px; border-radius:50%; background:#fff; color:#002B5B; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; }
