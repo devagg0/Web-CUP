@@ -25,6 +25,8 @@ class User extends Authenticatable
         'password',
         'role_id',
         'estado',
+        'registro',
+        'debe_cambiar_password',
     ];
 
     /**
@@ -37,22 +39,20 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'debe_cambiar_password' => 'boolean',
+    ];
 
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function postulante()
+    {
+        return $this->hasOne(Postulante::class);
     }
 
     public function isActive(): bool

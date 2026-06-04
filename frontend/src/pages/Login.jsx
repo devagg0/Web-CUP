@@ -233,6 +233,16 @@ export default function Login() {
             </button>
           </form>
 
+          <div className="preinscripcion-card">
+            <div className="preinscripcion-card-content">
+              <h3>¿No tienes cuenta?</h3>
+              <p>Realiza tu preinscripción CUP y comienza el proceso de admisión para el curso preuniversitario.</p>
+              <button type="button" className="btn-secondary" onClick={() => navigate('/preinscripcion')}>
+                Realizar preinscripción CUP
+              </button>
+            </div>
+          </div>
+
           {/* Footer Institucional */}
           <p className="footer-text">
             © 2026 Sistema de Admisión CUP - FICCT UAGRM. Todos los derechos

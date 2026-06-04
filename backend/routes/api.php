@@ -3,14 +3,18 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\MateriaController;
+use App\Http\Controllers\PreinscripcionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/preinscripcion', [PreinscripcionController::class, 'store']);
+Route::get('/preinscripcion/carreras-activas', [PreinscripcionController::class, 'carrerasActivas']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/cambiar-password', [AuthController::class, 'cambiarPassword']);
     Route::get('/carreras-activas', [CarreraController::class, 'activas']);
     Route::get('/materias-activas', [MateriaController::class, 'activas']);
 });
@@ -41,6 +45,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::put('/materias/{materia}', [MateriaController::class, 'update']);
     Route::patch('/materias/{materia}/estado', [MateriaController::class, 'updateEstado']);
     Route::delete('/materias/{materia}', [MateriaController::class, 'destroy']);
+
+    Route::get('/admin/preinscripciones', [PreinscripcionController::class, 'adminIndex']);
+    Route::get('/admin/preinscripciones/{postulante}', [PreinscripcionController::class, 'show']);
+    Route::post('/admin/preinscripciones/{postulante}/aprobar', [PreinscripcionController::class, 'aprobar']);
+    Route::post('/admin/preinscripciones/{postulante}/observar', [PreinscripcionController::class, 'observar']);
+    Route::post('/admin/preinscripciones/{postulante}/rechazar', [PreinscripcionController::class, 'rechazar']);
 });
 
 Route::get('/ping', function () {

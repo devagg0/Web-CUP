@@ -1,0 +1,200 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Search, RefreshCcw } from 'lucide-react';
+import Sidebar from '../components/Sidebar';
+import Header from '../components/Header';
+import PreinscripcionesTable from '../components/PreinscripcionesTable';
+import PreinscripcionDetailModal from '../components/PreinscripcionDetailModal';
+import * as preinscripcionService from '../services/preinscripcion';
+import '../styles/adminPreinscripciones.css';
+
+export default function AdminPreinscripciones() {
+  const [preinscripciones, setPreinscripciones] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterText, setFilterText] = useState('');
+  const [filterEstado, setFilterEstado] = useState('');
+  const [selected, setSelected] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const loadPreinscripciones = async () => {
+    setLoading(true);
+    setMessage('');
+    try {
+      const response = await preinscripcionService.getAdminPreinscripciones();
+      const data = response.data || response;
+      setPreinscripciones(Array.isArray(data) ? data : data.data || []);
+    } catch (err) {
+      console.error(err);
+      setMessage('No se pudieron cargar las preinscripciones. Intenta más tarde.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadPreinscripciones();
+  }, []);
+
+  const filteredPreinscripciones = useMemo(() => {
+    return preinscripciones.filter((item) => {
+      const searchValue = filterText.toLowerCase().trim();
+      const matchesSearch =
+        !searchValue ||
+        [item.ci, item.nombres, item.apellidos, item.correo]
+          .filter(Boolean)
+          .some((field) => field.toLowerCase().includes(searchValue));
+      const matchesEstado = !filterEstado || item.estado === filterEstado;
+      return matchesSearch && matchesEstado;
+    });
+  }, [preinscripciones, filterText, filterEstado]);
+
+  const stats = useMemo(() => {
+    const total = preinscripciones.length;
+    const enRevision = preinscripciones.filter((item) => item.estado === 'EN_REVISION').length;
+    const inscritos = preinscripciones.filter((item) => item.estado === 'INSCRITO' || item.estado === 'APROBADO').length;
+    const observados = preinscripciones.filter((item) => item.estado === 'OBSERVADO').length;
+    const rechazados = preinscripciones.filter((item) => item.estado === 'RECHAZADO').length;
+    return { total, enRevision, inscritos, observados, rechazados };
+  }, [preinscripciones]);
+
+  const openDetail = (item) => {
+    setSelected(item);
+    setModalOpen(true);
+  };
+
+  const closeDetail = () => {
+    setModalOpen(false);
+    setSelected(null);
+  };
+
+  const handleApprove = async (item) => {
+    try {
+      const response = await preinscripcionService.approvePreinscripcion(item.id);
+      const data = response.data || response;
+      setMessage('Preinscripción aprobada. Usuario postulante generado correctamente.');
+      if (data.registro || data.password_temporal || data.contrasena_temporal) {
+        setSelected({ ...item, approvalInfo: data });
+      }
+      await loadPreinscripciones();
+    } catch (err) {
+      console.error(err);
+      setMessage('Error al aprobar la preinscripción. Intenta de nuevo.');
+    }
+  };
+
+  const handleObserve = async (item, observacion) => {
+    try {
+      await preinscripcionService.observePreinscripcion(item.id, observacion);
+      setMessage('Preinscripción observada. El postulante será notificado.');
+      await loadPreinscripciones();
+    } catch (err) {
+      console.error(err);
+      setMessage('Error al observar la preinscripción. Intenta de nuevo.');
+    }
+  };
+
+  const handleReject = async (item, observacion) => {
+    try {
+      await preinscripcionService.rejectPreinscripcion(item.id, observacion);
+      setMessage('Preinscripción rechazada correctamente.');
+      await loadPreinscripciones();
+    } catch (err) {
+      console.error(err);
+      setMessage('Error al rechazar la preinscripción. Intenta de nuevo.');
+    }
+  };
+
+  const requestObserve = async (item) => {
+    const observacion = window.prompt('Motivo de observación');
+    if (!observacion?.trim()) return;
+    await handleObserve(item, observacion);
+  };
+
+  const requestReject = async (item) => {
+    const observacion = window.prompt('Motivo de rechazo');
+    if (!observacion?.trim()) return;
+    await handleReject(item, observacion);
+  };
+
+  return (
+    <div className="app-shell">
+      <Sidebar />
+      <main className="main-content">
+        <Header
+          title="Gestión de Preinscripciones CUP"
+          breadcrumb="Sistema de Admisión CUP / Preinscripciones"
+        />
+
+        <div className="content-inner">
+          <div className="stats-row">
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Total solicitudes</div>
+              <div className="stat-value">{stats.total}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">En revisión</div>
+              <div className="stat-value">{stats.enRevision}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Inscritos</div>
+              <div className="stat-value">{stats.inscritos}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Observados / Rechazados</div>
+              <div className="stat-value">{stats.observados + stats.rechazados}</div>
+            </div>
+          </div>
+
+          <div className="table-header-row">
+            <div className="filters admin-filters">
+              <label className="filter-group">
+                <Search size={18} />
+                <input
+                  type="text"
+                  placeholder="Buscar por CI, nombre o correo"
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                />
+              </label>
+              <select value={filterEstado} onChange={(e) => setFilterEstado(e.target.value)}>
+                <option value="">Todos los estados</option>
+                <option value="EN_REVISION">EN_REVISION</option>
+                <option value="OBSERVADO">OBSERVADO</option>
+                <option value="INSCRITO">INSCRITO</option>
+                <option value="RECHAZADO">RECHAZADO</option>
+              </select>
+              <button className="btn-secondary" type="button" onClick={() => { setFilterText(''); setFilterEstado(''); }}>
+                Limpiar filtros
+              </button>
+            </div>
+            <button className="btn-primary btn-refresh" type="button" onClick={loadPreinscripciones}>
+              <RefreshCcw size={16} /> Actualizar
+            </button>
+          </div>
+
+          {message && <div className="form-message">{message}</div>}
+
+          <div className="card table-card admin-table-card">
+            <PreinscripcionesTable
+              preinscripciones={filteredPreinscripciones}
+              onView={openDetail}
+              onApprove={handleApprove}
+              onObserve={requestObserve}
+              onReject={requestReject}
+              loading={loading}
+            />
+          </div>
+
+          <PreinscripcionDetailModal
+            open={modalOpen}
+            preinscripcion={selected}
+            onClose={closeDetail}
+            onApprove={handleApprove}
+            onObserve={handleObserve}
+            onReject={handleReject}
+          />
+        </div>
+      </main>
+    </div>
+  );
+}

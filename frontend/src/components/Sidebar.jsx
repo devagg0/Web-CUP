@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, Grid, BookOpen, Layers } from 'lucide-react';
+import { Users, Grid, BookOpen, Layers, ClipboardList } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
@@ -31,6 +31,9 @@ export default function Sidebar() {
             </NavLink>
             <NavLink to="/materias" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <Layers size={18} /> <span>Materias del CUP</span>
+            </NavLink>
+            <NavLink to="/admin/preinscripciones" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <ClipboardList size={18} /> <span>Preinscripciones CUP</span>
             </NavLink>
           </>
         )}

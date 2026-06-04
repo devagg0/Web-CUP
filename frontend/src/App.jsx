@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios';
 import Carreras from './pages/Carreras';
 import Materias from './pages/Materias';
+import Preinscripcion from './pages/Preinscripcion';
+import AdminPreinscripciones from './pages/AdminPreinscripciones';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
@@ -69,6 +71,15 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <Materias />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/preinscripcion" element={<Preinscripcion />} />
+        <Route
+          path="/admin/preinscripciones"
+          element={
+            <ProtectedRoute requiredRole="admin">
+              <AdminPreinscripciones />
             </ProtectedRoute>
           }
         />

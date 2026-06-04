@@ -441,6 +441,50 @@ html, body, #root {
   cursor: not-allowed;
 }
 
+.preinscripcion-card {
+  margin-top: 24px;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(15, 39, 66, 0.08);
+  border: 1px solid rgba(0, 59, 115, 0.08);
+}
+
+.preinscripcion-card-content {
+  display: grid;
+  gap: 16px;
+}
+
+.preinscripcion-card-content h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f2742;
+}
+
+.preinscripcion-card-content p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: none;
+  background: #003b73;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #0056b3;
+}
+
 /* Footer */
 .footer-text {
   font-size: 12px;
