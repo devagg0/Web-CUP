@@ -6,6 +6,7 @@ import Usuarios from './pages/Usuarios';
 import Carreras from './pages/Carreras';
 import Materias from './pages/Materias';
 import Preinscripcion from './pages/Preinscripcion';
+import ConsultaPreinscripcion from './pages/ConsultaPreinscripcion';
 import AdminPreinscripciones from './pages/AdminPreinscripciones';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
@@ -75,6 +76,7 @@ function App() {
           }
         />
         <Route path="/preinscripcion" element={<Preinscripcion />} />
+        <Route path="/consultar-preinscripcion" element={<ConsultaPreinscripcion />} />
         <Route
           path="/admin/preinscripciones"
           element={

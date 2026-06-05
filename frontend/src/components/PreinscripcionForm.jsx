@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import FileUploadBox from './FileUploadBox';
-import QRPaymentBox from './QRPaymentBox';
 
 const sexOptions = [
   { value: 'MASCULINO', label: 'MASCULINO' },
@@ -31,7 +30,6 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
     titulo_bachiller: null,
     carnet_identidad: null,
     otros: null,
-    comprobante_pago: null,
   });
   const [errors, setErrors] = useState({});
 
@@ -83,6 +81,7 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
 
     if (targetStep === 2 || targetStep === 4) {
       if (!values.primera_carrera_id) nextErrors.primera_carrera_id = 'Selecciona la primera carrera.';
+      if (!values.segunda_carrera_id) nextErrors.segunda_carrera_id = 'Selecciona la segunda carrera.';
       if (values.segunda_carrera_id && values.segunda_carrera_id === values.primera_carrera_id) {
         nextErrors.segunda_carrera_id = 'La segunda carrera debe ser diferente a la primera.';
       }
@@ -91,7 +90,6 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
     if (targetStep === 3 || targetStep === 4) {
       nextErrors.titulo_bachiller = validateFile('titulo_bachiller', files.titulo_bachiller);
       nextErrors.carnet_identidad = validateFile('carnet_identidad', files.carnet_identidad);
-      nextErrors.comprobante_pago = validateFile('comprobante_pago', files.comprobante_pago);
       if (files.otros) {
         nextErrors.otros = validateFile('otros', files.otros);
       }
@@ -136,12 +134,11 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
   const handleSubmit = () => {
     if (!validateStep(4)) return;
 
-    if (!(files.titulo_bachiller instanceof File) || !(files.carnet_identidad instanceof File) || !(files.comprobante_pago instanceof File)) {
+    if (!(files.titulo_bachiller instanceof File) || !(files.carnet_identidad instanceof File)) {
       setErrors((prev) => ({
         ...prev,
         titulo_bachiller: files.titulo_bachiller instanceof File ? prev.titulo_bachiller : 'Selecciona un archivo válido.',
         carnet_identidad: files.carnet_identidad instanceof File ? prev.carnet_identidad : 'Selecciona un archivo válido.',
-        comprobante_pago: files.comprobante_pago instanceof File ? prev.comprobante_pago : 'Selecciona un archivo válido.',
       }));
       return;
     }
@@ -158,13 +155,12 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
     formData.append('colegio_procedencia', values.colegio_procedencia.trim());
     formData.append('ciudad', values.ciudad.trim());
     formData.append('primera_carrera_id', values.primera_carrera_id);
-    formData.append('segunda_carrera_id', values.segunda_carrera_id || '');
+    formData.append('segunda_carrera_id', values.segunda_carrera_id);
     formData.append('titulo_bachiller', files.titulo_bachiller);
     formData.append('carnet_identidad', files.carnet_identidad);
     if (files.otros instanceof File) {
       formData.append('otros', files.otros);
     }
-    formData.append('comprobante_pago', files.comprobante_pago);
 
     for (const [key, value] of formData.entries()) {
       console.log(key, value, value instanceof File);
@@ -176,7 +172,7 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
   return (
     <form className="preinscripcion-form" onSubmit={(e) => e.preventDefault()}>
       <div className="stepper">
-        {['Datos personales', 'Carreras', 'Requisitos y pago', 'Confirmación'].map((label, index) => (
+        {['Datos personales', 'Carreras', 'Requisitos', 'Confirmación'].map((label, index) => (
           <div key={label} className={`step-pill ${step === index + 1 ? 'active' : ''}`}>
             <span>{`Paso ${index + 1}`}</span>
             <span>{label}</span>
@@ -302,7 +298,7 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
       {step === 2 && (
         <div className="step-card">
           <h3>Carreras</h3>
-          <p>Selecciona tu primera carrera y, opcionalmente, una segunda distinta.</p>
+          <p>Selecciona tu primera y segunda carrera. La segunda carrera es obligatoria y debe ser distinta.</p>
           <div className="field-grid single">
             <div className="field-group">
               <label htmlFor="primera_carrera_id">Primera carrera</label>
@@ -341,8 +337,8 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
 
       {step === 3 && (
         <div className="step-card">
-          <h3>Requisitos y pago</h3>
-          <p>Sube los archivos solicitados y confirma tu pago con el comprobante.</p>
+          <h3>Requisitos</h3>
+          <p>Sube los archivos solicitados para que administración revise tus documentos.</p>
           <div className="field-grid single">
             <FileUploadBox
               label="Título de bachiller"
@@ -365,14 +361,6 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
               error={errors.otros}
               required={false}
             />
-            <QRPaymentBox />
-            <FileUploadBox
-              label="Comprobante de pago"
-              file={files.comprobante_pago}
-              onChange={(file) => handleFileChange('comprobante_pago', file)}
-              error={errors.comprobante_pago}
-              required
-            />
           </div>
         </div>
       )}
@@ -394,12 +382,11 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
                 <span className="file-chip">Título de bachiller: {files.titulo_bachiller?.name || 'No seleccionado'}</span>
                 <span className="file-chip">Carnet de identidad: {files.carnet_identidad?.name || 'No seleccionado'}</span>
                 <span className="file-chip">Otros: {files.otros?.name || 'No aplicado'}</span>
-                <span className="file-chip">Comprobante: {files.comprobante_pago?.name || 'No seleccionado'}</span>
               </div>
             </div>
           </div>
           <div className="confirmation-note">
-            Tu solicitud será revisada por administración. Si requisitos y pago son aprobados, recibirás tu registro y contraseña temporal en tu correo electrónico.
+            Tus requisitos serán revisados por administración. Si son aprobados, podrás consultar tu preinscripción y realizar el pago.
           </div>
         </div>
       )}

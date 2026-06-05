@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/preinscripcion', [PreinscripcionController::class, 'store']);
+Route::post('/preinscripcion/consultar', [PreinscripcionController::class, 'consultar']);
+Route::post('/preinscripcion/pago', [PreinscripcionController::class, 'pago']);
 Route::get('/preinscripcion/carreras-activas', [PreinscripcionController::class, 'carrerasActivas']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -48,6 +50,10 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     Route::get('/admin/preinscripciones', [PreinscripcionController::class, 'adminIndex']);
     Route::get('/admin/preinscripciones/{postulante}', [PreinscripcionController::class, 'show']);
+    Route::post('/admin/preinscripciones/{postulante}/aprobar-requisitos', [PreinscripcionController::class, 'aprobarRequisitos']);
+    Route::post('/admin/preinscripciones/{postulante}/observar-requisitos', [PreinscripcionController::class, 'observarRequisitos']);
+    Route::post('/admin/preinscripciones/{postulante}/aprobar-pago', [PreinscripcionController::class, 'aprobarPago']);
+    Route::post('/admin/preinscripciones/{postulante}/observar-pago', [PreinscripcionController::class, 'observarPago']);
     Route::post('/admin/preinscripciones/{postulante}/aprobar', [PreinscripcionController::class, 'aprobar']);
     Route::post('/admin/preinscripciones/{postulante}/observar', [PreinscripcionController::class, 'observar']);
     Route::post('/admin/preinscripciones/{postulante}/rechazar', [PreinscripcionController::class, 'rechazar']);

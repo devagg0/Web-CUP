@@ -2,7 +2,19 @@ import { useMemo, useState } from 'react';
 import { XCircle } from 'lucide-react';
 import EstadoPreinscripcionBadge from './EstadoPreinscripcionBadge';
 
-export default function PreinscripcionDetailModal({ open, preinscripcion, onClose, onApprove, onObserve, onReject }) {
+const requirementStates = ['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS'];
+const paymentStates = ['PAGO_EN_REVISION', 'PAGO_OBSERVADO'];
+
+export default function PreinscripcionDetailModal({
+  open,
+  preinscripcion,
+  onClose,
+  onApproveRequirements,
+  onObserveRequirements,
+  onApprovePayment,
+  onObservePayment,
+  onReject,
+}) {
   const [actionType, setActionType] = useState('');
   const [observacion, setObservacion] = useState('');
 
@@ -34,8 +46,11 @@ export default function PreinscripcionDetailModal({ open, preinscripcion, onClos
 
   const handleAction = async () => {
     if (!record) return;
-    if (actionType === 'observe') {
-      await onObserve(record, observacion);
+    if (actionType === 'observe-requisitos') {
+      await onObserveRequirements(record, observacion);
+    }
+    if (actionType === 'observe-pago') {
+      await onObservePayment(record, observacion);
     }
     if (actionType === 'reject') {
       await onReject(record, observacion);
@@ -45,6 +60,10 @@ export default function PreinscripcionDetailModal({ open, preinscripcion, onClos
   };
 
   if (!open || !record) return null;
+
+  const estado = String(record.estado || record.status || '').toUpperCase();
+  const showRequirementActions = requirementStates.includes(estado);
+  const showPaymentActions = paymentStates.includes(estado);
 
   return (
     <div className="detail-modal-overlay">
@@ -66,8 +85,8 @@ export default function PreinscripcionDetailModal({ open, preinscripcion, onClos
             <strong>Carreras</strong>
             <p><strong>Primera:</strong> {getCourseName(record.primera_carrera)}</p>
             <p><strong>Segunda:</strong> {getCourseName(record.segunda_carrera)}</p>
-            <p><strong>Estado:</strong> <EstadoPreinscripcionBadge estado={record.estado} /></p>
-            <p><strong>Fecha:</strong> {record.created_at || record.fecha || '—'}</p>
+            <p><strong>Estado:</strong> <EstadoPreinscripcionBadge estado={estado} /></p>
+            <p><strong>Fecha:</strong> {record.created_at || record.fecha || record.fecha_creacion || record.createdAt || '—'}</p>
           </div>
         </div>
 
@@ -85,20 +104,54 @@ export default function PreinscripcionDetailModal({ open, preinscripcion, onClos
         </div>
 
         <div className="action-grid">
-          <button type="button" className="btn-primary" onClick={() => onApprove(record)}>
-            Aprobar solicitud
-          </button>
-          <button type="button" className="btn-secondary" onClick={() => setActionType('observe')}>
-            Observar
-          </button>
+          {showRequirementActions && (
+            <>
+              <button type="button" className="btn-primary" onClick={() => onApproveRequirements(record)}>
+                Aprobar requisitos
+              </button>
+              <button type="button" className="btn-secondary" onClick={() => setActionType('observe-requisitos')}>
+                Observar requisitos
+              </button>
+            </>
+          )}
+          {showPaymentActions && (
+            <>
+              <button type="button" className="btn-primary" onClick={() => onApprovePayment(record)}>
+                Aprobar pago
+              </button>
+              <button type="button" className="btn-secondary" onClick={() => setActionType('observe-pago')}>
+                Observar pago
+              </button>
+            </>
+          )}
           <button type="button" className="btn-danger" onClick={() => setActionType('reject')}>
             Rechazar
           </button>
         </div>
 
+        {estado === 'PAGO_HABILITADO' && (
+          <div className="observation-panel">
+            <strong>Pago habilitado</strong>
+            <p>Pago habilitado, esperando comprobante del postulante.</p>
+          </div>
+        )}
+
+        {estado === 'INSCRITO' && (
+          <div className="observation-panel">
+            <strong>Inscrito</strong>
+            <p>La inscripción fue aprobada. {record.registro ? `Registro: ${record.registro}.` : ''} {record.password_temporal ? `Contraseña temporal: ${record.password_temporal}.` : ''}</p>
+          </div>
+        )}
+
         {actionType && (
           <div className="observation-panel">
-            <strong>{actionType === 'observe' ? 'Motivo de observación' : 'Motivo de rechazo'}</strong>
+            <strong>
+              {actionType === 'observe-requisitos'
+                ? 'Motivo de observación de requisitos'
+                : actionType === 'observe-pago'
+                ? 'Motivo de observación de pago'
+                : 'Motivo de rechazo'}
+            </strong>
             <textarea
               value={observacion}
               onChange={(e) => setObservacion(e.target.value)}
@@ -110,7 +163,7 @@ export default function PreinscripcionDetailModal({ open, preinscripcion, onClos
               onClick={handleAction}
               disabled={!observacion.trim()}
             >
-              Enviar {actionType === 'observe' ? 'observación' : 'rechazo'}
+              Enviar {actionType.includes('observe') ? 'observación' : 'rechazo'}
             </button>
           </div>
         )}

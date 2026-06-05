@@ -430,6 +430,87 @@
   margin: 10px 0;
 }
 
+.button-row.success-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.consulta-card {
+  padding: 28px;
+}
+
+.consulta-panel {
+  display: grid;
+  gap: 24px;
+}
+
+.consulta-form {
+  display: grid;
+  gap: 18px;
+}
+
+.consulta-result-card {
+  background: #ffffff;
+  border-radius: 24px;
+  border: 1px solid #e2e8f0;
+  padding: 24px;
+  box-shadow: 0 18px 45px rgba(15, 39, 66, 0.08);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.result-header h3 {
+  margin: 0;
+  color: #003b73;
+}
+
+.result-details p {
+  margin: 10px 0;
+  color: #475569;
+}
+
+.status-card {
+  background: #f8fafc;
+  border-radius: 18px;
+  padding: 18px 20px;
+  border: 1px solid #dbeafe;
+  margin-top: 18px;
+}
+
+.info-card {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #0f2742;
+}
+
+.warning-card {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.success-status-card {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #166534;
+}
+
+.danger-card {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
 @media (max-width: 900px) {
   .field-grid {
     grid-template-columns: 1fr;

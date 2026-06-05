@@ -16,7 +16,7 @@ export default function Preinscripcion() {
       setError('');
       setLoading(true);
       try {
-        const response = await preinscripcionService.getCarrerasActivas();
+        const response = await preinscripcionService.getCarrerasPreinscripcion();
         const data = response.data || response;
         setCarreras(Array.isArray(data) ? data : data.data || []);
       } catch (err) {
@@ -34,7 +34,7 @@ export default function Preinscripcion() {
     setError('');
     setSubmitting(true);
     try {
-      const response = await preinscripcionService.submitPreinscripcion(formData);
+      const response = await preinscripcionService.enviarPreinscripcion(formData);
       const data = response.data || response;
       setSuccessData(data);
     } catch (err) {
@@ -69,7 +69,7 @@ export default function Preinscripcion() {
           <div className="section-intro">
             <h2>Formulario de Preinscripción</h2>
             <p>
-              Llena tus datos personales, selecciona carreras, sube requisitos y carga tu comprobante de pago.
+              Llena tus datos personales, selecciona carreras y sube tus requisitos. El pago se realiza después desde la consulta pública.
             </p>
           </div>
 

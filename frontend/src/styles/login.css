@@ -467,6 +467,80 @@ html, body, #root {
   line-height: 1.6;
 }
 
+.public-access-section {
+  margin-top: 30px;
+}
+
+.access-header {
+  margin-bottom: 18px;
+}
+
+.access-header h3 {
+  margin: 0 0 6px;
+  font-size: 1.15rem;
+  color: #0f2742;
+}
+
+.access-header p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.public-access-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.access-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 18px;
+  background: #ffffff;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.access-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 35px rgba(0, 59, 115, 0.08);
+}
+
+.access-card-icon {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+}
+
+.access-card-icon-blue {
+  background: #003b73;
+}
+
+.access-card-icon-light {
+  background: #0056b3;
+}
+
+.access-card h4 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  color: #0f2742;
+}
+
+.access-card p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.6;
+}
+
 .btn-secondary {
   display: inline-flex;
   align-items: center;

@@ -50,11 +50,14 @@ export default function AdminPreinscripciones() {
 
   const stats = useMemo(() => {
     const total = preinscripciones.length;
-    const enRevision = preinscripciones.filter((item) => item.estado === 'EN_REVISION').length;
-    const inscritos = preinscripciones.filter((item) => item.estado === 'INSCRITO' || item.estado === 'APROBADO').length;
-    const observados = preinscripciones.filter((item) => item.estado === 'OBSERVADO').length;
+    const enRevision = preinscripciones.filter((item) => item.estado === 'EN_REVISION_REQUISITOS').length;
+    const requisitosObservados = preinscripciones.filter((item) => item.estado === 'REQUISITOS_OBSERVADOS').length;
+    const pagoHabilitado = preinscripciones.filter((item) => item.estado === 'PAGO_HABILITADO').length;
+    const pagoEnRevision = preinscripciones.filter((item) => item.estado === 'PAGO_EN_REVISION').length;
+    const pagoObservado = preinscripciones.filter((item) => item.estado === 'PAGO_OBSERVADO').length;
+    const inscritos = preinscripciones.filter((item) => item.estado === 'INSCRITO').length;
     const rechazados = preinscripciones.filter((item) => item.estado === 'RECHAZADO').length;
-    return { total, enRevision, inscritos, observados, rechazados };
+    return { total, enRevision, requisitosObservados, pagoHabilitado, pagoEnRevision, pagoObservado, inscritos, rechazados };
   }, [preinscripciones]);
 
   const openDetail = (item) => {
@@ -67,35 +70,61 @@ export default function AdminPreinscripciones() {
     setSelected(null);
   };
 
-  const handleApprove = async (item) => {
+  const handleApproveRequirements = async (item) => {
     try {
-      const response = await preinscripcionService.approvePreinscripcion(item.id);
+      const response = await preinscripcionService.aprobarRequisitos(item.id);
       const data = response.data || response;
-      setMessage('Preinscripción aprobada. Usuario postulante generado correctamente.');
+      setMessage('Requisitos aprobados correctamente.');
       if (data.registro || data.password_temporal || data.contrasena_temporal) {
         setSelected({ ...item, approvalInfo: data });
       }
       await loadPreinscripciones();
     } catch (err) {
       console.error(err);
-      setMessage('Error al aprobar la preinscripción. Intenta de nuevo.');
+      setMessage('Error al aprobar los requisitos. Intenta de nuevo.');
     }
   };
 
-  const handleObserve = async (item, observacion) => {
+  const handleApprovePayment = async (item) => {
     try {
-      await preinscripcionService.observePreinscripcion(item.id, observacion);
-      setMessage('Preinscripción observada. El postulante será notificado.');
+      const response = await preinscripcionService.aprobarPago(item.id);
+      const data = response.data || response;
+      setMessage('Pago aprobado. Usuario postulante generado correctamente.');
+      if (data.registro || data.password_temporal || data.contrasena_temporal) {
+        setSelected({ ...item, approvalInfo: data });
+      }
       await loadPreinscripciones();
     } catch (err) {
       console.error(err);
-      setMessage('Error al observar la preinscripción. Intenta de nuevo.');
+      setMessage('Error al aprobar el pago. Intenta de nuevo.');
+    }
+  };
+
+  const handleObserveRequirements = async (item, observacion) => {
+    try {
+      await preinscripcionService.observarRequisitos(item.id, observacion);
+      setMessage('Requisitos observados. El postulante será notificado.');
+      await loadPreinscripciones();
+    } catch (err) {
+      console.error(err);
+      setMessage('Error al observar los requisitos. Intenta de nuevo.');
+    }
+  };
+
+  const handleObservePayment = async (item, observacion) => {
+    try {
+      await preinscripcionService.observarPago(item.id, observacion);
+      setMessage('Pago observado. El postulante será notificado.');
+      await loadPreinscripciones();
+    } catch (err) {
+      console.error(err);
+      setMessage('Error al observar el pago. Intenta de nuevo.');
     }
   };
 
   const handleReject = async (item, observacion) => {
     try {
-      await preinscripcionService.rejectPreinscripcion(item.id, observacion);
+      await preinscripcionService.rechazarPreinscripcion(item.id, observacion);
       setMessage('Preinscripción rechazada correctamente.');
       await loadPreinscripciones();
     } catch (err) {
@@ -107,7 +136,12 @@ export default function AdminPreinscripciones() {
   const requestObserve = async (item) => {
     const observacion = window.prompt('Motivo de observación');
     if (!observacion?.trim()) return;
-    await handleObserve(item, observacion);
+    const estado = String(item.estado || item.status || '').toUpperCase();
+    if (['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS'].includes(estado)) {
+      await handleObserveRequirements(item, observacion);
+    } else {
+      await handleObservePayment(item, observacion);
+    }
   };
 
   const requestReject = async (item) => {
@@ -132,16 +166,32 @@ export default function AdminPreinscripciones() {
               <div className="stat-value">{stats.total}</div>
             </div>
             <div className="stat-card admin-stat-card">
-              <div className="stat-label">En revisión</div>
+              <div className="stat-label">En revisión de requisitos</div>
               <div className="stat-value">{stats.enRevision}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Requisitos observados</div>
+              <div className="stat-value">{stats.requisitosObservados}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Pago habilitado</div>
+              <div className="stat-value">{stats.pagoHabilitado}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Pago en revisión</div>
+              <div className="stat-value">{stats.pagoEnRevision}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Pago observado</div>
+              <div className="stat-value">{stats.pagoObservado}</div>
             </div>
             <div className="stat-card admin-stat-card">
               <div className="stat-label">Inscritos</div>
               <div className="stat-value">{stats.inscritos}</div>
             </div>
             <div className="stat-card admin-stat-card">
-              <div className="stat-label">Observados / Rechazados</div>
-              <div className="stat-value">{stats.observados + stats.rechazados}</div>
+              <div className="stat-label">Rechazados</div>
+              <div className="stat-value">{stats.rechazados}</div>
             </div>
           </div>
 
@@ -158,8 +208,11 @@ export default function AdminPreinscripciones() {
               </label>
               <select value={filterEstado} onChange={(e) => setFilterEstado(e.target.value)}>
                 <option value="">Todos los estados</option>
-                <option value="EN_REVISION">EN_REVISION</option>
-                <option value="OBSERVADO">OBSERVADO</option>
+                <option value="EN_REVISION_REQUISITOS">EN_REVISION_REQUISITOS</option>
+                <option value="REQUISITOS_OBSERVADOS">REQUISITOS_OBSERVADOS</option>
+                <option value="PAGO_HABILITADO">PAGO_HABILITADO</option>
+                <option value="PAGO_EN_REVISION">PAGO_EN_REVISION</option>
+                <option value="PAGO_OBSERVADO">PAGO_OBSERVADO</option>
                 <option value="INSCRITO">INSCRITO</option>
                 <option value="RECHAZADO">RECHAZADO</option>
               </select>
@@ -178,8 +231,10 @@ export default function AdminPreinscripciones() {
             <PreinscripcionesTable
               preinscripciones={filteredPreinscripciones}
               onView={openDetail}
-              onApprove={handleApprove}
-              onObserve={requestObserve}
+              onApproveRequirements={handleApproveRequirements}
+              onObserveRequirements={requestObserve}
+              onApprovePayment={handleApprovePayment}
+              onObservePayment={requestObserve}
               onReject={requestReject}
               loading={loading}
             />
@@ -189,8 +244,10 @@ export default function AdminPreinscripciones() {
             open={modalOpen}
             preinscripcion={selected}
             onClose={closeDetail}
-            onApprove={handleApprove}
-            onObserve={handleObserve}
+            onApproveRequirements={handleApproveRequirements}
+            onObserveRequirements={handleObserveRequirements}
+            onApprovePayment={handleApprovePayment}
+            onObservePayment={handleObservePayment}
             onReject={handleReject}
           />
         </div>

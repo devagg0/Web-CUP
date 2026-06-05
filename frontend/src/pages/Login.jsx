@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, ArrowRight, Search } from 'lucide-react';
 import api from '../services/api';
 import escudo from '../assets/escudo-ficct.png';
 import '../styles/login.css';
-
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -15,13 +14,11 @@ export default function Login() {
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
 
-  // Validar email
   const validateEmail = (emailValue) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(emailValue);
   };
 
-  // Validar formulario antes de enviar
   const validateForm = () => {
     const newErrors = {};
 
@@ -39,7 +36,6 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejar envío del formulario
   const handleSubmit = async (e) => {
     e.preventDefault();
     setGeneralError('');
@@ -57,15 +53,11 @@ export default function Login() {
       });
 
       if (response.data && response.data.token) {
-        // Guardar token y user en sessionStorage
         sessionStorage.setItem('token', response.data.token);
         sessionStorage.setItem('user', JSON.stringify(response.data.user));
-
-        // Redirigir al dashboard
         navigate('/dashboard');
       }
     } catch (error) {
-      // Manejar diferentes tipos de errores
       if (error.response) {
         const status = error.response.status;
 
@@ -74,7 +66,6 @@ export default function Login() {
         } else if (status === 403) {
           setGeneralError('Usuario inactivo o bloqueado.');
         } else if (status === 422) {
-          // Errores de validación del backend
           if (error.response.data.errors) {
             setErrors(error.response.data.errors);
           } else {
@@ -95,32 +86,24 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      {/* Panel Izquierdo */}
       <div className="login-left">
         <div className="left-content">
-          {/* Escudo */}
           <div className="escudo-container">
-            <img 
-              src={escudo} 
-              alt="Escudo FICCT UAGRM" 
+            <img
+              src={escudo}
+              alt="Escudo FICCT UAGRM"
               className="escudo-image"
               onError={(e) => {
-                // Fallback si la imagen no carga
                 e.target.style.display = 'none';
               }}
             />
           </div>
 
-          {/* Título Principal */}
           <h1 className="title">Sistema de Admisión CUP</h1>
-
-          {/* Subtítulo Institucional */}
           <p className="subtitle">
-            Facultad de Ingeniería en Ciencias de la Computación y
-            Telecomunicaciones - UAGRM
+            Facultad de Ingeniería en Ciencias de la Computación y Telecomunicaciones - UAGRM
           </p>
 
-          {/* Decoración Tecnológica */}
           <div className="tech-decoration">
             <div className="circuit-line circuit-1"></div>
             <div className="circuit-line circuit-2"></div>
@@ -129,84 +112,66 @@ export default function Login() {
             <div className="circuit-dot dot-3"></div>
           </div>
 
-          {/* Frase Institucional */}
           <p className="institutional-phrase">
             Conectando innovación, ciencia y educación
           </p>
         </div>
       </div>
 
-      {/* Panel Derecho */}
       <div className="login-right">
         <div className="form-container">
-          {/* Ícono de Candado */}
           <div className="lock-icon-container">
             <LogIn size={40} className="lock-icon" />
           </div>
 
-          {/* Título */}
           <h2 className="form-title">Bienvenido</h2>
-
-          {/* Descripción */}
           <p className="form-description">
-            Ingresa tus credenciales para acceder al Sistema de Admisión CUP.
+            Ingresa tus credenciales o utiliza los accesos públicos para iniciar el proceso de preinscripción y seguimiento.
           </p>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="login-form">
-            {/* Mensaje de Error General */}
             {generalError && (
               <div className="error-message-container">
                 <p className="error-message">{generalError}</p>
               </div>
             )}
 
-            {/* Campo Email */}
             <div className="form-group">
               <label htmlFor="email" className="form-label">
                 Correo Electrónico
               </label>
-              <div className="input-wrapper">
+              <div className={`input-wrapper ${errors.email ? 'input-error' : ''}`}>
                 <Mail size={20} className="input-icon" />
                 <input
                   type="email"
                   id="email"
-                  className={`form-input ${errors.email ? 'input-error' : ''}`}
+                  className="form-input"
                   placeholder="admin@cup.com"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    // Limpiar error cuando el usuario comienza a escribir
-                    if (errors.email) {
-                      setErrors({ ...errors, email: '' });
-                    }
+                    if (errors.email) setErrors((prev) => ({ ...prev, email: '' }));
                   }}
                 />
               </div>
-              {errors.email && (
-                <p className="field-error">{errors.email}</p>
-              )}
+              {errors.email && <p className="field-error">{errors.email}</p>}
             </div>
 
-            {/* Campo Password */}
             <div className="form-group">
               <label htmlFor="password" className="form-label">
                 Contraseña
               </label>
-              <div className="input-wrapper password-wrapper">
+              <div className={`input-wrapper password-wrapper ${errors.password ? 'input-error' : ''}`}>
                 <Lock size={20} className="input-icon" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
-                  className={`form-input ${errors.password ? 'input-error' : ''}`}
+                  className="form-input"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
-                    // Limpiar error cuando el usuario comienza a escribir
-                    if (errors.password) {
-                      setErrors({ ...errors, password: '' });
-                    }
+                    if (errors.password) setErrors((prev) => ({ ...prev, password: '' }));
                   }}
                 />
                 <button
@@ -218,35 +183,44 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="field-error">{errors.password}</p>
-              )}
+              {errors.password && <p className="field-error">{errors.password}</p>}
             </div>
 
-            {/* Botón Iniciar Sesión */}
-            <button
-              type="submit"
-              className="btn-login"
-              disabled={loading}
-            >
+            <button type="submit" className="btn-login" disabled={loading}>
               {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
             </button>
           </form>
 
-          <div className="preinscripcion-card">
-            <div className="preinscripcion-card-content">
-              <h3>¿No tienes cuenta?</h3>
-              <p>Realiza tu preinscripción CUP y comienza el proceso de admisión para el curso preuniversitario.</p>
-              <button type="button" className="btn-secondary" onClick={() => navigate('/preinscripcion')}>
-                Realizar preinscripción CUP
+          <div className="public-access-section">
+            <div className="access-header">
+              <h3>Accesos públicos</h3>
+              <p>Si eres postulante, utiliza estas opciones para avanzar sin necesidad de cuenta.</p>
+            </div>
+            <div className="public-access-grid">
+              <button type="button" className="access-card" onClick={() => navigate('/preinscripcion')}>
+                <div className="access-card-icon access-card-icon-blue">
+                  <ArrowRight size={24} />
+                </div>
+                <div>
+                  <h4>Realizar preinscripción CUP</h4>
+                  <p>Si eres postulante nuevo, comienza tu preinscripción aquí.</p>
+                </div>
+              </button>
+
+              <button type="button" className="access-card" onClick={() => navigate('/consultar-preinscripcion')}>
+                <div className="access-card-icon access-card-icon-light">
+                  <Search size={24} />
+                </div>
+                <div>
+                  <h4>Consultar preinscripción</h4>
+                  <p>Si ya enviaste tus requisitos, consulta el estado aquí.</p>
+                </div>
               </button>
             </div>
           </div>
 
-          {/* Footer Institucional */}
           <p className="footer-text">
-            © 2026 Sistema de Admisión CUP - FICCT UAGRM. Todos los derechos
-            reservados.
+            © 2026 Sistema de Admisión CUP - FICCT UAGRM. Todos los derechos reservados.
           </p>
         </div>
       </div>
