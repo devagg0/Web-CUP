@@ -316,7 +316,7 @@ export default function PreinscripcionForm({ carreras, onSubmit, submitting }) {
             </div>
 
             <div className="field-group">
-              <label htmlFor="segunda_carrera_id">Segunda carrera (opcional)</label>
+              <label htmlFor="segunda_carrera_id">Segunda carrera</label>
               <select
                 id="segunda_carrera_id"
                 value={values.segunda_carrera_id}

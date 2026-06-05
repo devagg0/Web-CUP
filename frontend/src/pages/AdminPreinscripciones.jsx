@@ -9,7 +9,7 @@ import { ESTADOS } from '../utils/estadoPreinscripcion';
 import '../styles/adminPreinscripciones.css';
 
 // Estados válidos en Preinscripciones CUP (requisitos y solicitud)
-const VALID_ESTADOS_PREINSCRIPCIONES = ['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS', 'PAGO_HABILITADO', 'RECHAZADO'];
+const VALID_ESTADOS_PREINSCRIPCIONES = ['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS', 'PAGO_HABILITADO', 'INSCRITO', 'RECHAZADO'];
 
 export default function AdminPreinscripciones() {
   const [preinscripciones, setPreinscripciones] = useState([]);
@@ -68,9 +68,10 @@ export default function AdminPreinscripciones() {
     const enRevision = filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'EN_REVISION_REQUISITOS').length;
     const requisitosObservados = filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'REQUISITOS_OBSERVADOS').length;
     const pagoHabilitado = filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'PAGO_HABILITADO').length;
+    const inscritos = filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'INSCRITO').length;
     const rechazados = filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'RECHAZADO').length;
     
-    return { total, enRevision, requisitosObservados, pagoHabilitado, rechazados };
+    return { total, enRevision, requisitosObservados, pagoHabilitado, inscritos, rechazados };
   }, [preinscripciones]);
 
   const openDetail = (item) => {
@@ -158,6 +159,10 @@ export default function AdminPreinscripciones() {
             <div className="stat-card admin-stat-card">
               <div className="stat-label">Pago habilitado</div>
               <div className="stat-value">{stats.pagoHabilitado}</div>
+            </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Inscritos</div>
+              <div className="stat-value">{stats.inscritos}</div>
             </div>
             <div className="stat-card admin-stat-card">
               <div className="stat-label">Rechazados</div>

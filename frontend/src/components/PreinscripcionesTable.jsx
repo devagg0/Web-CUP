@@ -6,6 +6,7 @@ const ACTION_RULES = {
   EN_REVISION_REQUISITOS: { view: true, approveRequirements: true, observeRequirements: true, reject: true },
   REQUISITOS_OBSERVADOS: { view: true, observeRequirements: true, reject: true },
   PAGO_HABILITADO: { view: true },
+  INSCRITO: { view: true },
   RECHAZADO: { view: true },
 };
 

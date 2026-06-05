@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { validateToken } from '../services/auth';
 
 export default function ProtectedRoute({ children, requiredRole }) {
   const token = sessionStorage.getItem('token');
+  const location = useLocation();
   const [checking, setChecking] = useState(true);
   const [allowed, setAllowed] = useState(false);
 
@@ -35,15 +36,25 @@ export default function ProtectedRoute({ children, requiredRole }) {
   if (checking) return null;
   if (!allowed) return <Navigate to="/login" replace />;
 
+  let user = null;
+  try {
+    const stored = sessionStorage.getItem('user');
+    user = stored ? JSON.parse(stored) : null;
+  } catch (e) {
+    user = null;
+  }
+
+  if (user?.debe_cambiar_password && location.pathname !== '/cambiar-password') {
+    return <Navigate to="/cambiar-password" replace />;
+  }
+
+  if (!user?.debe_cambiar_password && location.pathname === '/cambiar-password') {
+    return <Navigate to={user?.role === 'postulante' ? '/perfil-postulante' : '/dashboard'} replace />;
+  }
+
   if (requiredRole) {
-    try {
-      const stored = sessionStorage.getItem('user');
-      const user = stored ? JSON.parse(stored) : null;
-      if (!user || user.role !== requiredRole) {
-        return <Navigate to="/dashboard" replace />;
-      }
-    } catch (e) {
-      return <Navigate to="/dashboard" replace />;
+    if (!user || user.role !== requiredRole) {
+      return <Navigate to={user?.role === 'postulante' ? '/perfil-postulante' : '/dashboard'} replace />;
     }
   }
 

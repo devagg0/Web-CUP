@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
@@ -9,6 +9,8 @@ import Preinscripcion from './pages/Preinscripcion';
 import ConsultaPreinscripcion from './pages/ConsultaPreinscripcion';
 import AdminPreinscripciones from './pages/AdminPreinscripciones';
 import AdminPagosPreinscripcion from './pages/AdminPagosPreinscripcion';
+import CambiarPassword from './pages/CambiarPassword';
+import PerfilPostulante from './pages/PerfilPostulante';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
@@ -27,8 +29,25 @@ function App() {
 
       validateToken().then((ok) => {
         if (!mounted) return;
-        if (ok) navigate('/dashboard', { replace: true });
-        else navigate('/login', { replace: true });
+        if (!ok) {
+          navigate('/login', { replace: true });
+          return;
+        }
+
+        let user = null;
+        try {
+          const stored = sessionStorage.getItem('user');
+          user = stored ? JSON.parse(stored) : null;
+        } catch (e) {
+          user = null;
+        }
+        if (user?.debe_cambiar_password) {
+          navigate('/cambiar-password', { replace: true });
+        } else if (user?.role === 'postulante') {
+          navigate('/perfil-postulante', { replace: true });
+        } else {
+          navigate('/dashboard', { replace: true });
+        }
       });
 
       return () => {
@@ -44,6 +63,22 @@ function App() {
       <Routes>
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
+        <Route
+          path="/cambiar-password"
+          element={
+            <ProtectedRoute>
+              <CambiarPassword />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/perfil-postulante"
+          element={
+            <ProtectedRoute>
+              <PerfilPostulante />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard"
           element={

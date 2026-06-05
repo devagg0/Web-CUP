@@ -3,17 +3,20 @@ import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import * as preinscripcionService from '../services/preinscripcion';
 import PagosPreinscripcionTable from '../components/PagosPreinscripcionTable';
+import PagoPreinscripcionDetailModal from '../components/PagoPreinscripcionDetailModal';
 import { ESTADOS } from '../utils/estadoPreinscripcion';
 import '../styles/adminPagosPreinscripcion.css';
 
 // Estados válidos en Pagos CUP
-const VALID_PAYMENT_STATES = ['PAGO_HABILITADO', 'PAGO_EN_REVISION', 'PAGO_OBSERVADO'];
+const VALID_PAYMENT_STATES = ['PAGO_HABILITADO', 'PAGO_EN_REVISION', 'PAGO_OBSERVADO', 'INSCRITO'];
 
 export default function AdminPagosPreinscripcion() {
   const [preinscripciones, setPreinscripciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterText, setFilterText] = useState('');
   const [filterEstado, setFilterEstado] = useState('');
+  const [selected, setSelected] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [message, setMessage] = useState('');
 
   const loadPreinscripciones = async () => {
@@ -44,6 +47,7 @@ export default function AdminPagosPreinscripcion() {
       pagoHabilitado: filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'PAGO_HABILITADO').length,
       pagoEnRevision: filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'PAGO_EN_REVISION').length,
       pagoObservado: filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'PAGO_OBSERVADO').length,
+      inscritos: filtered.filter((item) => String(item.estado_preinscripcion || item.estado || '').toUpperCase() === 'INSCRITO').length,
     };
   }, [preinscripciones]);
 
@@ -68,6 +72,7 @@ export default function AdminPagosPreinscripcion() {
         window.alert(`Registro: ${data.registro || ''}\nContraseña temporal: ${data.password_temporal || data.contrasena_temporal || ''}`);
       }
       await loadPreinscripciones();
+      closeDetail();
     } catch (err) {
       console.error(err);
       setMessage('Error al aprobar el pago.');
@@ -79,10 +84,21 @@ export default function AdminPagosPreinscripcion() {
       await preinscripcionService.observarPago(item.id, observacion);
       setMessage('Pago observado. El postulante será notificado.');
       await loadPreinscripciones();
+      closeDetail();
     } catch (err) {
       console.error(err);
       setMessage('Error al observar el pago.');
     }
+  };
+
+  const openDetail = (item) => {
+    setSelected(item);
+    setModalOpen(true);
+  };
+
+  const closeDetail = () => {
+    setModalOpen(false);
+    setSelected(null);
   };
 
   return (
@@ -109,6 +125,10 @@ export default function AdminPagosPreinscripcion() {
               <div className="stat-label">Pago observado</div>
               <div className="stat-value">{stats.pagoObservado}</div>
             </div>
+            <div className="stat-card admin-stat-card">
+              <div className="stat-label">Inscritos</div>
+              <div className="stat-value">{stats.inscritos}</div>
+            </div>
           </div>
 
           <div className="filters-row">
@@ -128,11 +148,18 @@ export default function AdminPagosPreinscripcion() {
           <div className="card table-card admin-table-card">
             <PagosPreinscripcionTable
               preinscripciones={filtered}
-              onApprovePayment={handleApprovePayment}
-              onObservePayment={handleObservePayment}
+              onView={openDetail}
               loading={loading}
             />
           </div>
+
+          <PagoPreinscripcionDetailModal
+            open={modalOpen}
+            preinscripcion={selected}
+            onClose={closeDetail}
+            onApprovePayment={handleApprovePayment}
+            onObservePayment={handleObservePayment}
+          />
         </div>
       </main>
     </div>

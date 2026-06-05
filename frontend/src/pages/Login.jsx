@@ -14,18 +14,11 @@ export default function Login() {
   const [generalError, setGeneralError] = useState('');
   const navigate = useNavigate();
 
-  const validateEmail = (emailValue) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(emailValue);
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
     if (!email.trim()) {
-      newErrors.email = 'El correo electrónico es obligatorio.';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Ingrese un correo electrónico válido.';
+      newErrors.email = 'El correo o registro es obligatorio.';
     }
 
     if (!password.trim()) {
@@ -48,14 +41,22 @@ export default function Login() {
 
     try {
       const response = await api.post('/login', {
-        email,
+        email: email.trim(),
         password,
       });
 
       if (response.data && response.data.token) {
+        const user = response.data.user;
         sessionStorage.setItem('token', response.data.token);
-        sessionStorage.setItem('user', JSON.stringify(response.data.user));
-        navigate('/dashboard');
+        sessionStorage.setItem('user', JSON.stringify(user));
+
+        if (user?.debe_cambiar_password === true) {
+          navigate('/cambiar-password');
+        } else if (user?.role === 'postulante') {
+          navigate('/perfil-postulante');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch (error) {
       if (error.response) {
@@ -138,15 +139,15 @@ export default function Login() {
 
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Correo Electrónico
+                Correo o registro
               </label>
               <div className={`input-wrapper ${errors.email ? 'input-error' : ''}`}>
                 <Mail size={20} className="input-icon" />
                 <input
-                  type="email"
+                  type="text"
                   id="email"
                   className="form-input"
-                  placeholder="admin@cup.com"
+                  placeholder="admin@cup.com o 219051216"
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);

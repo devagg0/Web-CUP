@@ -133,10 +133,11 @@ export default function ConsultaPreinscripcionPanel({
 
           {estado === 'PAGO_HABILITADO' && (
             <div className="payment-section">
-              <QRPaymentBox />
               <div className="status-card info-card">
-                <p>Escanea el QR, realiza el pago y sube el comprobante para continuar.</p>
+                <p><strong>Pago habilitado</strong></p>
+                <p>Tus requisitos fueron aprobados. Ya puedes realizar el pago para completar tu inscripción.</p>
               </div>
+              <QRPaymentBox />
               <form className="consulta-form" onSubmit={handleUploadSubmit}>
                 <div className="field-grid single">
                   <FileUploadBox
@@ -155,7 +156,7 @@ export default function ConsultaPreinscripcionPanel({
                     {uploadLoading ? 'Enviando comprobante...' : 'Enviar comprobante'}
                   </button>
                 </div>
-                {uploadSuccess && <div className="form-message">{uploadSuccess}</div>}
+                {uploadSuccess && <div className="form-message success-card"><strong>✓ Éxito</strong><p>{uploadSuccess}</p></div>}
               </form>
             </div>
           )}

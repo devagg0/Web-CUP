@@ -21,6 +21,12 @@ export async function validateToken() {
   }
 }
 
+export async function cambiarPassword(data) {
+  const response = await api.post('/cambiar-password', data);
+  return response.data;
+}
+
 export default {
   validateToken,
+  cambiarPassword,
 };

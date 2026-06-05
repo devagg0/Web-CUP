@@ -20,10 +20,16 @@ export default function ConsultaPreinscripcion() {
 
     try {
       const response = await preinscripcionService.consultarPreinscripcion(data);
-      const responseData = response.data || response;
-      setResult(responseData);
+      // response.data ya está normalizado en el servicio
+      const resultado = response.data;
+      
+      if (resultado) {
+        setResult(resultado);
+      } else {
+        setError('No se encontró información de la preinscripción.');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Error en handleSearch:', err);
       if (err.response?.data?.message) {
         setError(err.response.data.message);
       } else {
@@ -41,11 +47,12 @@ export default function ConsultaPreinscripcion() {
 
     try {
       const response = await preinscripcionService.enviarComprobantePago(formData);
-      const responseData = response.data || response;
-      setResult(responseData);
+      // response.data ya está normalizado en el servicio
+      const resultado = response.data;
+      setResult(resultado);
       setUploadSuccess('Comprobante enviado correctamente. Espera la revisión de administración.');
     } catch (err) {
-      console.error(err);
+      console.error('Error en handleUpload:', err);
       if (err.response?.data?.message) {
         setUploadError(err.response.data.message);
       } else {

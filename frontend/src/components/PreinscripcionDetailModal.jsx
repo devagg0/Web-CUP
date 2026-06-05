@@ -3,12 +3,11 @@ import { XCircle } from 'lucide-react';
 import EstadoPreinscripcionBadge from './EstadoPreinscripcionBadge';
 import { normalizeFileUrl } from '../services/api';
 
-const requirementStates = ['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS'];
-
 const ACTION_RULES = {
   EN_REVISION_REQUISITOS: { approveRequirements: true, observeRequirements: true, reject: true },
   REQUISITOS_OBSERVADOS: { observeRequirements: true, reject: true },
   PAGO_HABILITADO: {},
+  INSCRITO: {},
   RECHAZADO: {},
 };
 
@@ -47,11 +46,6 @@ export default function PreinscripcionDetailModal({
     return normalizeFileUrl(rawLink);
   };
 
-  const getFileName = (fileObj) => {
-    if (!fileObj) return 'No disponible';
-    return fileObj.nombre || fileObj.name || getFileLink(fileObj)?.split('/').pop() || 'Archivo adjunto';
-  };
-
   const handleAction = async () => {
     if (!record) return;
     if (actionType === 'observe-requisitos') {
@@ -68,7 +62,6 @@ export default function PreinscripcionDetailModal({
 
   const estado = String(record.estado_preinscripcion || record.estado || record.status || '').toUpperCase();
   const rules = ACTION_RULES[estado] || {};
-  const showRequirementActions = requirementStates.includes(estado);
 
   return (
     <div className="detail-modal-overlay">
@@ -207,142 +200,6 @@ export default function PreinscripcionDetailModal({
               disabled={!observacion.trim()}
             >
               Enviar {actionType === 'observe-requisitos' ? 'observación' : 'rechazo'}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-        </button>
-        <h3>Detalle de preinscripción</h3>
-        <div className="detail-section">
-          <div className="detail-item">
-            <strong>Datos personales</strong>
-            <p><strong>CI:</strong> {record.ci || '—'}</p>
-            <p><strong>Nombre:</strong> {nombreCompleto || '—'}</p>
-            <p><strong>Correo:</strong> {record.correo || '—'}</p>
-            <p><strong>Teléfono:</strong> {record.telefono || '—'}</p>
-            <p><strong>Ciudad:</strong> {record.ciudad || '—'}</p>
-          </div>
-          <div className="detail-item">
-            <strong>Carreras</strong>
-            <p><strong>Primera:</strong> {getCourseName(record.primera_carrera)}</p>
-            <p><strong>Segunda:</strong> {getCourseName(record.segunda_carrera)}</p>
-            <p><strong>Estado:</strong> <EstadoPreinscripcionBadge estado={estado} /></p>
-            <p><strong>Fecha:</strong> {record.created_at || record.fecha || record.fecha_creacion || record.createdAt || '—'}</p>
-          </div>
-        </div>
-
-        <div className="detail-section single">
-          <div className="detail-item">
-            <strong>Archivos cargados</strong>
-            <p>
-              <strong>Título de bachiller:</strong>{' '}
-              {(() => {
-                const r = getRequisito('TITULO_BACHILLER');
-                return r ? (
-                  <a href={getFileLink(r)} target="_blank" rel="noopener noreferrer">Ver archivo</a>
-                ) : (
-                  'No disponible'
-                );
-              })()}
-            </p>
-            <p>
-              <strong>Carnet de identidad:</strong>{' '}
-              {(() => {
-                const r = getRequisito('CARNET_IDENTIDAD');
-                return r ? (
-                  <a href={getFileLink(r)} target="_blank" rel="noopener noreferrer">Ver archivo</a>
-                ) : (
-                  'No disponible'
-                );
-              })()}
-            </p>
-            <p>
-              <strong>Otros:</strong>{' '}
-              {(() => {
-                const r = getRequisito('OTROS');
-                return r ? (
-                  <a href={getFileLink(r)} target="_blank" rel="noopener noreferrer">Ver archivo</a>
-                ) : (
-                  'No hay otros archivos'
-                );
-              })()}
-            </p>
-
-            <p>
-              <strong>Comprobante de pago:</strong>{' '}
-              {(() => {
-                // posibles ubicaciones del comprobante
-                const pago = record.pago || record.pago_preinscripcion || null;
-                const comprobante = pago ? (pago.comprobante_url ? { archivo_url: pago.comprobante_url } : pago) : record.comprobante_pago || null;
-                const link = getFileLink(comprobante);
-                if (link) {
-                  return (<><a href={link} target="_blank" rel="noopener noreferrer">Ver comprobante</a></>);
-                }
-                // Si no existe comprobante y pago aún no enviado
-                const estadoLocal = String(record.estado_preinscripcion || record.estado || record.status || '').toUpperCase();
-                if (estadoLocal === 'PAGO_HABILITADO') {
-                  return 'Comprobante pendiente. Se habilitará después de aprobar requisitos.';
-                }
-                return 'No disponible';
-              })()}
-            </p>
-          </div>
-        </div>
-
-        <div className="action-grid">
-          {rules.approveRequirements && (
-            <button type="button" className="btn-primary" onClick={() => onApproveRequirements(record)}>
-              Aprobar requisitos
-            </button>
-          )}
-          {rules.observeRequirements && (
-            <button type="button" className="btn-secondary" onClick={() => setActionType('observe-requisitos')}>
-              Observar requisitos
-            </button>
-          )}
-          {rules.reject && (
-            <button type="button" className="btn-danger" onClick={() => setActionType('reject')}>
-              Rechazar
-            </button>
-          )}
-        </div>
-
-        {estado === 'PAGO_HABILITADO' && (
-          <div className="observation-panel">
-            <strong>Pago habilitado</strong>
-            <p>Pago habilitado, esperando comprobante del postulante.</p>
-          </div>
-        )}
-
-        {estado === 'INSCRITO' && (
-          <div className="observation-panel">
-            <strong>Inscrito</strong>
-            <p>La inscripción fue aprobada. {record.registro ? `Registro: ${record.registro}.` : ''} {record.password_temporal ? `Contraseña temporal: ${record.password_temporal}.` : ''}</p>
-          </div>
-        )}
-
-        {actionType && (
-          <div className="observation-panel">
-            <strong>
-              {actionType === 'observe-requisitos'
-                ? 'Motivo de observación de requisitos'
-                : 'Motivo de rechazo'}
-            </strong>
-            <textarea
-              value={observacion}
-              onChange={(e) => setObservacion(e.target.value)}
-              placeholder="Describe el motivo para el postulante"
-            />
-            <button
-              type="button"
-              className="btn-primary"
-              onClick={handleAction}
-              disabled={!observacion.trim()}
-            >
-              Enviar {actionType.includes('observe') ? 'observación' : 'rechazo'}
             </button>
           </div>
         )}

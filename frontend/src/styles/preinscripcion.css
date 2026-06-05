@@ -430,6 +430,26 @@
   margin: 10px 0;
 }
 
+.form-message {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  color: #166534;
+  border-radius: 16px;
+  padding: 16px 18px;
+  margin-top: 16px;
+}
+
+.form-message strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #15803d;
+}
+
+.form-message p {
+  margin: 0;
+  color: #166534;
+}
+
 .button-row.success-actions {
   display: flex;
   justify-content: center;
@@ -517,6 +537,118 @@
   margin-top: 18px;
 }
 
+.payment-row h4 {
+  margin: 0 0 16px;
+  color: #003b73;
+  font-size: 1.1rem;
+}
+
+.qr-card {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+  background: #f8fafc;
+  border: 1px solid #dbeafe;
+  border-radius: 18px;
+  padding: 24px;
+  margin: 16px 0;
+}
+
+.qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-placeholder {
+  width: 180px;
+  height: 180px;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.qr-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 8px;
+}
+
+.qr-cell {
+  width: 30px;
+  height: 30px;
+  border-radius: 2px;
+}
+
+.qr-label {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0;
+  font-weight: 500;
+}
+
+.qr-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-label {
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.detail-value {
+  color: #003b73;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.payment-instructions {
+  background: #ffffff;
+  border-left: 4px solid #003b73;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-top: 8px;
+}
+
+.payment-instructions p {
+  margin: 0 0 10px;
+  color: #0f2742;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.payment-instructions ol {
+  margin: 0;
+  padding-left: 20px;
+  color: #475569;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.payment-instructions li {
+  margin-bottom: 6px;
+}
+
 @media (max-width: 900px) {
   .field-grid {
     grid-template-columns: 1fr;
@@ -524,6 +656,16 @@
 
   .button-row {
     flex-direction: column;
+  }
+
+  .qr-card {
+    grid-template-columns: 1fr;
+  }
+
+  .qr-placeholder {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto;
   }
 }
 

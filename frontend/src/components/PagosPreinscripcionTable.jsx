@@ -1,14 +1,9 @@
 import EstadoPreinscripcionBadge from './EstadoPreinscripcionBadge';
-import { Eye, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Eye } from 'lucide-react';
 
-export default function PagosPreinscripcionTable({ preinscripciones, onApprovePayment, onObservePayment, loading }) {
+export default function PagosPreinscripcionTable({ preinscripciones, onView, loading }) {
   if (loading) return <div className="loading-message">Cargando...</div>;
   if (!preinscripciones.length) return <div className="no-data">No hay solicitudes.</div>;
-
-  const handleObserve = (item) => {
-    const obs = window.prompt('Motivo de observación');
-    if (obs?.trim()) onObservePayment(item, obs);
-  };
 
   return (
     <div className="table-wrapper preinscripciones-table-wrapper">
@@ -20,7 +15,6 @@ export default function PagosPreinscripcionTable({ preinscripciones, onApprovePa
             <th>Correo</th>
             <th>Carrera principal</th>
             <th>Estado</th>
-            <th>Observación</th>
             <th>Fecha</th>
             <th>Acciones</th>
           </tr>
@@ -31,7 +25,6 @@ export default function PagosPreinscripcionTable({ preinscripciones, onApprovePa
             const estado = String(item.estado_preinscripcion || item.estado || '').toUpperCase();
             const fecha = item.created_at || item.fecha || '—';
             const primera = item.primera_carrera?.nombre || item.primera_carrera || '—';
-            const observacion = item.observacion || item.observacion_pago || '—';
 
             return (
               <tr key={item.id}>
@@ -40,30 +33,12 @@ export default function PagosPreinscripcionTable({ preinscripciones, onApprovePa
                 <td>{item.correo || '—'}</td>
                 <td>{primera}</td>
                 <td><EstadoPreinscripcionBadge estado={estado} /></td>
-                <td>{observacion}</td>
                 <td>{fecha}</td>
                 <td>
                   <div className="actions-cell">
-                    {estado === 'PAGO_HABILITADO' && (
-                      <span className="payment-status" title="Esperando comprobante del postulante">
-                        Esperando comprobante
-                      </span>
-                    )}
-                    {estado === 'PAGO_EN_REVISION' && (
-                      <>
-                        <button className="icon-btn" type="button" title="Aprobar pago" onClick={() => onApprovePayment(item)}>
-                          <CheckCircle2 size={18} />
-                        </button>
-                        <button className="icon-btn" type="button" title="Observar pago" onClick={() => handleObserve(item)}>
-                          <AlertTriangle size={18} />
-                        </button>
-                      </>
-                    )}
-                    {estado === 'PAGO_OBSERVADO' && (
-                      <span className="payment-status-observed" title="Observación en pago">
-                        Con observación
-                      </span>
-                    )}
+                    <button className="icon-btn" type="button" title="Ver detalle" onClick={() => onView(item)}>
+                      <Eye size={18} />
+                    </button>
                   </div>
                 </td>
               </tr>
