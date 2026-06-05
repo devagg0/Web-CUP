@@ -35,6 +35,9 @@ export default function Sidebar() {
             <NavLink to="/admin/preinscripciones" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
               <ClipboardList size={18} /> <span>Preinscripciones CUP</span>
             </NavLink>
+            <NavLink to="/admin/pagos-preinscripcion" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+              <ClipboardList size={18} /> <span>Pagos CUP</span>
+            </NavLink>
           </>
         )}
       </nav>

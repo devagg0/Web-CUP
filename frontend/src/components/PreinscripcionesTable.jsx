@@ -1,16 +1,19 @@
 import EstadoPreinscripcionBadge from './EstadoPreinscripcionBadge';
 import { Eye, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
-const needsRequirementActions = ['EN_REVISION_REQUISITOS', 'REQUISITOS_OBSERVADOS'];
-const needsPaymentActions = ['PAGO_EN_REVISION', 'PAGO_OBSERVADO'];
+// Action rules per estado - solo acciones de requisitos
+const ACTION_RULES = {
+  EN_REVISION_REQUISITOS: { view: true, approveRequirements: true, observeRequirements: true, reject: true },
+  REQUISITOS_OBSERVADOS: { view: true, observeRequirements: true, reject: true },
+  PAGO_HABILITADO: { view: true },
+  RECHAZADO: { view: true },
+};
 
 export default function PreinscripcionesTable({
   preinscripciones,
   onView,
   onApproveRequirements,
   onObserveRequirements,
-  onApprovePayment,
-  onObservePayment,
   onReject,
   loading,
 }) {
@@ -43,9 +46,8 @@ export default function PreinscripcionesTable({
             const segundaCarrera = item.segunda_carrera?.nombre || item.segunda_carrera || item.segundaCarrera || '—';
             const nombreCompleto = `${item.nombres || ''} ${item.apellidos || ''}`.trim() || '—';
             const fecha = item.created_at || item.fecha || item.fecha_creacion || item.createdAt || '—';
-            const estado = String(item.estado || item.status || '').toUpperCase();
-            const showRequirementButtons = needsRequirementActions.includes(estado);
-            const showPaymentButtons = needsPaymentActions.includes(estado);
+            const estado = String(item.estado_preinscripcion || item.estado || item.status || '').toUpperCase();
+            const rules = ACTION_RULES[estado] || {};
 
             return (
               <tr key={item.id}>
@@ -58,32 +60,26 @@ export default function PreinscripcionesTable({
                 <td>{fecha}</td>
                 <td>
                   <div className="actions-cell">
-                    <button className="icon-btn" type="button" title="Ver detalle" onClick={() => onView(item)}>
-                      <Eye size={18} />
-                    </button>
-                    {showRequirementButtons && (
-                      <>
-                        <button className="icon-btn" type="button" title="Aprobar requisitos" onClick={() => onApproveRequirements(item)}>
-                          <CheckCircle2 size={18} />
-                        </button>
-                        <button className="icon-btn" type="button" title="Observar requisitos" onClick={() => onObserveRequirements(item)}>
-                          <AlertTriangle size={18} />
-                        </button>
-                      </>
+                    {rules.view && (
+                      <button className="icon-btn" type="button" title="Ver detalle" onClick={() => onView(item)}>
+                        <Eye size={18} />
+                      </button>
                     )}
-                    {showPaymentButtons && (
-                      <>
-                        <button className="icon-btn" type="button" title="Aprobar pago" onClick={() => onApprovePayment(item)}>
-                          <CheckCircle2 size={18} />
-                        </button>
-                        <button className="icon-btn" type="button" title="Observar pago" onClick={() => onObservePayment(item)}>
-                          <AlertTriangle size={18} />
-                        </button>
-                      </>
+                    {rules.approveRequirements && (
+                      <button className="icon-btn" type="button" title="Aprobar requisitos" onClick={() => onApproveRequirements(item)}>
+                        <CheckCircle2 size={18} />
+                      </button>
                     )}
-                    <button className="icon-btn danger" type="button" title="Rechazar solicitud" onClick={() => onReject(item)}>
-                      <XCircle size={18} />
-                    </button>
+                    {rules.observeRequirements && (
+                      <button className="icon-btn" type="button" title="Observar requisitos" onClick={() => onObserveRequirements(item)}>
+                        <AlertTriangle size={18} />
+                      </button>
+                    )}
+                    {rules.reject && (
+                      <button className="icon-btn danger" type="button" title="Rechazar solicitud" onClick={() => onReject(item)}>
+                        <XCircle size={18} />
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

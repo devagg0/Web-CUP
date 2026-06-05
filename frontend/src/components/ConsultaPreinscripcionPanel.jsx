@@ -31,7 +31,7 @@ export default function ConsultaPreinscripcionPanel({
   const [comprobante, setComprobante] = useState(null);
   const [formErrors, setFormErrors] = useState({});
 
-  const estado = useMemo(() => String(result?.estado || result?.status || '').toUpperCase(), [result]);
+  const estado = useMemo(() => String(result?.estado_preinscripcion || result?.estado || result?.status || '').toUpperCase(), [result]);
 
   const validateSearch = () => {
     const nextErrors = {};
@@ -127,7 +127,7 @@ export default function ConsultaPreinscripcionPanel({
           {estado === 'REQUISITOS_OBSERVADOS' && (
             <div className="status-card warning-card">
               <p>Tu solicitud presenta observaciones. Revisa el mensaje del admin y sigue sus instrucciones.</p>
-              {result.observacion && <p><strong>Observación:</strong> {result.observacion}</p>}
+              {(result.observacion || result.observacion_admin) && <p><strong>Observación:</strong> {result.observacion || result.observacion_admin}</p>}
             </div>
           )}
 
@@ -169,7 +169,7 @@ export default function ConsultaPreinscripcionPanel({
           {estado === 'PAGO_OBSERVADO' && (
             <div className="status-card warning-card">
               <p>Tu comprobante fue observado por administración.</p>
-              {result.observacion && <p><strong>Observación:</strong> {result.observacion}</p>}
+              {(result.observacion || result.observacion_admin) && <p><strong>Observación:</strong> {result.observacion || result.observacion_admin}</p>}
             </div>
           )}
 
