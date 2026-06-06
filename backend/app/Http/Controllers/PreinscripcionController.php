@@ -6,17 +6,19 @@ use App\Models\Carrera;
 use App\Models\PagoPreinscripcion;
 use App\Models\Postulante;
 use App\Models\RequisitoPostulante;
-use App\Models\Role;
-use App\Models\User;
+use App\Services\PostulanteAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
 class PreinscripcionController extends Controller
 {
+    public function __construct(private readonly PostulanteAccountService $accountService)
+    {
+    }
+
     public function carrerasActivas()
     {
         $carreras = Carrera::where('estado', 'ACTIVA')->get();
@@ -366,54 +368,30 @@ class PreinscripcionController extends Controller
             ], 422);
         }
 
-        $rolPostulante = Role::where('nombre', 'postulante')->first();
+        try {
+            $credenciales = DB::transaction(function () use ($postulante) {
+                $credenciales = $this->accountService->crearCuentaPostulante($postulante);
 
-        if (! $rolPostulante) {
+                $postulante->update([
+                    'estado_preinscripcion' => 'INSCRITO',
+                    'fecha_aprobacion' => now()->toDateString(),
+                ]);
+
+                $postulante->pago->update(['estado' => 'APROBADO']);
+
+                return $credenciales;
+            });
+        } catch (\RuntimeException $exception) {
             return response()->json([
-                'message' => 'Rol postulante no configurado en el sistema.',
+                'message' => $exception->getMessage(),
             ], 500);
         }
-
-        $registro = $this->generarRegistroSecuencial();
-        $passwordTemporal = $this->generarPasswordTemporal();
-
-        DB::transaction(function () use ($postulante, $rolPostulante, $registro, $passwordTemporal) {
-            $user = User::create([
-                'name' => trim($postulante->nombres . ' ' . $postulante->apellidos),
-                'email' => $postulante->correo,
-                'registro' => $registro,
-                'password' => Hash::make($passwordTemporal),
-                'role_id' => $rolPostulante->id,
-                'estado' => 'ACTIVO',
-                'debe_cambiar_password' => true,
-            ]);
-
-            $postulante->update([
-                'user_id' => $user->id,
-                'estado_preinscripcion' => 'INSCRITO',
-                'fecha_aprobacion' => now()->toDateString(),
-            ]);
-
-            $postulante->pago->update(['estado' => 'APROBADO']);
-        });
-
-        Mail::raw(
-            "Estimado/a {$postulante->nombres} {$postulante->apellidos},\n\n" .
-            "Su pago ha sido aprobado y su usuario ha sido generado correctamente.\n\n" .
-            "Registro: {$registro}\n" .
-            "Contraseña temporal: {$passwordTemporal}\n\n" .
-            "Por favor ingrese al sistema y cambie su contraseña en el primer acceso.",
-            function ($message) use ($postulante) {
-                $message->to($postulante->correo)
-                    ->subject('Pago aprobado - Sistema CUP');
-            }
-        );
 
         return response()->json([
             'message' => 'Pago aprobado. Usuario postulante generado correctamente.',
             'credenciales' => [
-                'registro' => $registro,
-                'password_temporal' => $passwordTemporal,
+                'registro' => $credenciales['registro'],
+                'password_temporal' => $credenciales['password_temporal'],
             ],
             'estado' => 'INSCRITO',
         ]);
@@ -540,29 +518,4 @@ class PreinscripcionController extends Controller
         return $archivo->storeAs("preinscripciones/{$postulanteId}", $filename, 'public');
     }
 
-    private function generarRegistroSecuencial(): string
-    {
-        $maxRegistro = DB::table('users')
-            ->selectRaw("MAX(CAST(registro AS BIGINT)) as max_registro")
-            ->whereNotNull('registro')
-            ->whereRaw("registro ~ '^[0-9]+$'")
-            ->value('max_registro');
-
-        if (! $maxRegistro) {
-            return '219051216';
-        }
-
-        $next = (string) (((int) $maxRegistro) + 1);
-
-        if (User::where('registro', $next)->exists()) {
-            throw new \RuntimeException('No fue posible generar un registro único.');
-        }
-
-        return $next;
-    }
-
-    private function generarPasswordTemporal(): string
-    {
-        return 'CUP-' . str_pad((string) random_int(0, 99999), 5, '0', STR_PAD_LEFT);
-    }
 }

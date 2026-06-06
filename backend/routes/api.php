@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\ImportacionPostulantesController;
+use App\Http\Controllers\ImportacionUsuariosController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\PreinscripcionController;
 use App\Http\Controllers\UserController;
@@ -29,6 +31,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::patch('/users/{user}/estado', [UserController::class, 'updateEstado']);
     Route::delete('/users/{user}', [UserController::class, 'destroy']);
     Route::get('/roles', [UserController::class, 'roles']);
+    Route::post('/admin/users/importar', [ImportacionUsuariosController::class, 'importar']);
 
     // Rutas de Carreras
     Route::get('/carreras', [CarreraController::class, 'index']);
@@ -49,6 +52,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/materias/{materia}', [MateriaController::class, 'destroy']);
 
     Route::get('/admin/preinscripciones', [PreinscripcionController::class, 'adminIndex']);
+    Route::post('/admin/preinscripciones/importar', [ImportacionPostulantesController::class, 'importar']);
     Route::get('/admin/preinscripciones/{postulante}', [PreinscripcionController::class, 'show']);
     Route::post('/admin/preinscripciones/{postulante}/aprobar-requisitos', [PreinscripcionController::class, 'aprobarRequisitos']);
     Route::post('/admin/preinscripciones/{postulante}/observar-requisitos', [PreinscripcionController::class, 'observarRequisitos']);

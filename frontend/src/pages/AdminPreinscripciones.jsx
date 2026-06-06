@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, RefreshCcw } from 'lucide-react';
+import { Search, RefreshCcw, Upload } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import PreinscripcionesTable from '../components/PreinscripcionesTable';
 import PreinscripcionDetailModal from '../components/PreinscripcionDetailModal';
+import ImportarPostulantesModal from '../components/ImportarPostulantesModal';
 import * as preinscripcionService from '../services/preinscripcion';
 import { ESTADOS } from '../utils/estadoPreinscripcion';
 import '../styles/adminPreinscripciones.css';
@@ -18,7 +19,18 @@ export default function AdminPreinscripciones() {
   const [filterEstado, setFilterEstado] = useState('');
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [importModalOpen, setImportModalOpen] = useState(false);
   const [message, setMessage] = useState('');
+
+  const isAdmin = useMemo(() => {
+    try {
+      const stored = sessionStorage.getItem('user');
+      const user = stored ? JSON.parse(stored) : null;
+      return user?.role === 'admin';
+    } catch {
+      return false;
+    }
+  }, []);
 
   const loadPreinscripciones = async () => {
     setLoading(true);
@@ -133,6 +145,11 @@ export default function AdminPreinscripciones() {
     await handleReject(item, observacion);
   };
 
+  const handleImportSuccess = async () => {
+    setMessage('Importación finalizada. La lista de preinscripciones fue actualizada.');
+    await loadPreinscripciones();
+  };
+
   return (
     <div className="app-shell">
       <Sidebar />
@@ -191,9 +208,16 @@ export default function AdminPreinscripciones() {
                 Limpiar filtros
               </button>
             </div>
-            <button className="btn-primary btn-refresh" type="button" onClick={loadPreinscripciones}>
-              <RefreshCcw size={16} /> Actualizar
-            </button>
+            <div className="admin-header-actions">
+              {isAdmin && (
+                <button className="btn-secondary btn-import" type="button" onClick={() => setImportModalOpen(true)}>
+                  <Upload size={16} /> Importar postulantes
+                </button>
+              )}
+              <button className="btn-primary btn-refresh" type="button" onClick={loadPreinscripciones}>
+                <RefreshCcw size={16} /> Actualizar
+              </button>
+            </div>
           </div>
 
           {message && <div className="form-message">{message}</div>}
@@ -216,6 +240,12 @@ export default function AdminPreinscripciones() {
             onApproveRequirements={handleApproveRequirements}
             onObserveRequirements={handleObserveRequirements}
             onReject={handleReject}
+          />
+
+          <ImportarPostulantesModal
+            open={importModalOpen}
+            onClose={() => setImportModalOpen(false)}
+            onImported={handleImportSuccess}
           />
         </div>
       </main>

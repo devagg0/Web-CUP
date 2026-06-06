@@ -45,6 +45,16 @@ export const enviarComprobantePago = async (formData) => {
 
 export const getAdminPreinscripciones = (params) => api.get('/admin/preinscripciones', { params });
 export const getAdminPreinscripcion = (id) => api.get(`/admin/preinscripciones/${id}`);
+export const importarPostulantes = (file) => {
+  const formData = new FormData();
+  formData.append('archivo', file);
+
+  return api.post('/admin/preinscripciones/importar', formData, {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+};
 export const aprobarRequisitos = (id) => api.post(`/admin/preinscripciones/${id}/aprobar-requisitos`);
 export const observarRequisitos = (id, observacion) => api.post(`/admin/preinscripciones/${id}/observar-requisitos`, { observacion });
 export const aprobarPago = (id) => api.post(`/admin/preinscripciones/${id}/aprobar-pago`);

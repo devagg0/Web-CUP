@@ -35,6 +35,13 @@ export async function getRoles() {
   return (response.data && response.data.data) || [];
 }
 
+export async function importarUsuarios(file) {
+  const formData = new FormData();
+  formData.append('archivo', file);
+  const response = await api.post('/admin/users/importar', formData);
+  return response.data;
+}
+
 export default {
   getUsers,
   getUser,
@@ -43,4 +50,5 @@ export default {
   patchEstado,
   deleteUser,
   getRoles,
+  importarUsuarios,
 };

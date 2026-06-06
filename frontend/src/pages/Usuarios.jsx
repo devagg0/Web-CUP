@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Upload } from 'lucide-react';
 import UsuariosTable from '../components/UsuariosTable';
 import UserForm from '../components/UserForm';
-import StateBadge from '../components/StateBadge';
+import ImportarUsuariosModal from '../components/ImportarUsuariosModal';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
-import RoleBadge from '../components/RoleBadge';
 import * as usersService from '../services/users';
 import '../styles/usuarios.css';
 
@@ -17,6 +16,7 @@ export default function Usuarios() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [message, setMessage] = useState('');
 
@@ -126,7 +126,10 @@ export default function Usuarios() {
               <button className="btn-ghost" onClick={handleSearch}>Aplicar</button>
             </div>
 
-            <div>
+            <div className="usuarios-actions">
+              <button className="btn-secondary btn-import-users" onClick={() => setImportOpen(true)}>
+                <Upload size={16} /> Importar usuarios
+              </button>
               <button className="btn-primary" onClick={handleCreate}>Nuevo usuario</button>
             </div>
           </div>
@@ -144,6 +147,14 @@ export default function Usuarios() {
           </div>
 
           <UserForm open={formOpen} onClose={()=>setFormOpen(false)} onSubmit={handleSubmit} initial={editing || {}} roles={roles} />
+          <ImportarUsuariosModal
+            open={importOpen}
+            onClose={() => setImportOpen(false)}
+            onImported={() => {
+              setMessage('Importación de usuarios completada');
+              return fetchUsers(page);
+            }}
+          />
         </div>
       </main>
     </div>
