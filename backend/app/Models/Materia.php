@@ -19,4 +19,9 @@ class Materia extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public function docentes()
+    {
+        return $this->hasMany(Docente::class);
+    }
 }

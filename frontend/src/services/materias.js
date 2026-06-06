@@ -5,6 +5,11 @@ export async function getMaterias() {
   return response.data;
 }
 
+export async function getMateriasActivas() {
+  const response = await api.get('/materias-activas');
+  return response.data;
+}
+
 export async function getMateria(id) {
   const response = await api.get(`/materias/${id}`);
   return response.data;
@@ -37,6 +42,7 @@ export async function getMateriasResumen() {
 
 export default {
   getMaterias,
+  getMateriasActivas,
   getMateria,
   createMateria,
   updateMateria,

@@ -1,0 +1,260 @@
+.grupos-cup-page .content-inner {
+  max-width: 1440px;
+}
+
+.grupos-heading {
+  background: #fff;
+  padding: 22px 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 39, 66, 0.08);
+  margin-bottom: 20px;
+}
+
+.grupos-heading p,
+.grupo-students-section p,
+.modal-title-row p {
+  margin: 6px 0 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.grupos-stats {
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+}
+
+.grupos-controls {
+  align-items: flex-start;
+}
+
+.grupos-filters,
+.grupos-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.grupos-filters {
+  flex: 1;
+}
+
+.grupos-filters .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.grupos-filters .filter-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 15px;
+  color: #0f2742;
+  background: transparent;
+}
+
+.grupos-filters select {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  min-width: 180px;
+  background: #fff;
+  color: #0f2742;
+}
+
+.btn-inline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.grupos-table-wrapper,
+.grupo-students-table-wrapper {
+  overflow-x: auto;
+}
+
+.grupos-table,
+.grupo-students-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.grupos-table {
+  min-width: 980px;
+}
+
+.grupo-students-table {
+  min-width: 920px;
+}
+
+.grupos-table th,
+.grupos-table td,
+.grupo-students-table th,
+.grupo-students-table td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.grupos-table thead th,
+.grupo-students-table thead th {
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.grupos-table tbody tr:hover,
+.grupo-students-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(0, 86, 179, 0.05), rgba(0, 86, 179, 0.02));
+}
+
+.estado-grupo-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.estado-grupo-badge.habilitado {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.estado-grupo-badge.inactivo {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-action {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dbe4ef;
+  border-radius: 10px;
+  background: #fff;
+  color: #003b73;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.icon-action:hover:not(:disabled) {
+  background: #f8fbff;
+  border-color: #9bb5cf;
+  transform: translateY(-1px);
+}
+
+.icon-action.danger {
+  color: #dc2626;
+}
+
+.icon-action:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.grupo-modal-overlay {
+  z-index: 1100;
+}
+
+.grupo-detail-modal {
+  width: min(1120px, 100%);
+}
+
+.grupo-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.grupo-detail-summary div {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.grupo-detail-summary span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.grupo-detail-summary strong {
+  color: #0f2742;
+}
+
+.grupo-students-section h4 {
+  margin: 0 0 12px;
+  color: #003b73;
+}
+
+.empty-state {
+  padding: 24px;
+  text-align: center;
+  color: #64748b;
+  font-weight: 700;
+}
+
+@media (max-width: 1180px) {
+  .grupos-stats {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .grupo-detail-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .grupos-cup-page .app-sidebar {
+    display: none;
+  }
+
+  .grupos-controls,
+  .grupos-filters,
+  .grupos-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .grupos-filters .filter-group,
+  .grupos-filters select,
+  .grupos-filters button,
+  .grupos-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .grupos-stats,
+  .grupo-detail-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .grupos-filters .filter-group {
+    min-width: 0;
+  }
+}

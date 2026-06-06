@@ -5,6 +5,9 @@ import Dashboard from './pages/Dashboard';
 import Usuarios from './pages/Usuarios';
 import Carreras from './pages/Carreras';
 import Materias from './pages/Materias';
+import GestionDocentes from './pages/GestionDocentes';
+import GestionGruposCup from './pages/GestionGruposCup';
+import MiPerfilDocente from './pages/MiPerfilDocente';
 import Preinscripcion from './pages/Preinscripcion';
 import ConsultaPreinscripcion from './pages/ConsultaPreinscripcion';
 import AdminPreinscripciones from './pages/AdminPreinscripciones';
@@ -108,6 +111,30 @@ function App() {
           element={
             <ProtectedRoute requiredRole="admin">
               <Materias />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/docentes"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <GestionDocentes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/grupos-cup"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <GestionGruposCup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/docente/mi-perfil"
+          element={
+            <ProtectedRoute requiredRole="docente">
+              <MiPerfilDocente />
             </ProtectedRoute>
           }
         />

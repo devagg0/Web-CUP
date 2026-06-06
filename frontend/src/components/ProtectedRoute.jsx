@@ -53,7 +53,12 @@ export default function ProtectedRoute({ children, requiredRole }) {
   }
 
   if (requiredRole) {
-    if (!user || user.role !== requiredRole) {
+    const userRole = user?.role?.toLowerCase();
+    const allowedRoles = Array.isArray(requiredRole)
+      ? requiredRole.map((role) => role.toLowerCase())
+      : [requiredRole.toLowerCase()];
+
+    if (!user || !allowedRoles.includes(userRole)) {
       return <Navigate to={user?.role === 'postulante' ? '/perfil-postulante' : '/dashboard'} replace />;
     }
   }

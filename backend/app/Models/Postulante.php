@@ -62,4 +62,10 @@ class Postulante extends Model
     {
         return $this->hasOne(PagoPreinscripcion::class);
     }
+
+    public function gruposCup()
+    {
+        return $this->belongsToMany(GrupoCup::class, 'grupo_postulante', 'postulante_id', 'grupo_id')
+            ->withTimestamps();
+    }
 }

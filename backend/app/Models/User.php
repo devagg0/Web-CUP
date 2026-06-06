@@ -55,6 +55,11 @@ class User extends Authenticatable
         return $this->hasOne(Postulante::class);
     }
 
+    public function docente()
+    {
+        return $this->hasOne(Docente::class);
+    }
+
     public function isActive(): bool
     {
         return $this->estado === 'ACTIVO';

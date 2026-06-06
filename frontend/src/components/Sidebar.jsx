@@ -1,11 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Users, Grid, BookOpen, Layers, ClipboardList } from 'lucide-react';
+import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
   const stored = sessionStorage.getItem('user');
   const user = stored ? JSON.parse(stored) : null;
+  const role = user?.role?.toLowerCase();
+  const canViewDocentes = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
+  const canViewGruposCup = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
 
   return (
     <aside className="app-sidebar">
@@ -39,6 +42,21 @@ export default function Sidebar() {
               <ClipboardList size={18} /> <span>Pagos CUP</span>
             </NavLink>
           </>
+        )}
+        {canViewDocentes && (
+          <NavLink to="/docentes" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <GraduationCap size={18} /> <span>Docentes</span>
+          </NavLink>
+        )}
+        {canViewGruposCup && (
+          <NavLink to="/grupos-cup" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <UsersRound size={18} /> <span>Grupos CUP</span>
+          </NavLink>
+        )}
+        {role === 'docente' && (
+          <NavLink to="/docente/mi-perfil" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <UserRound size={18} /> <span>Mi perfil docente</span>
+          </NavLink>
         )}
       </nav>
 

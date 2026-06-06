@@ -1,0 +1,496 @@
+.docentes-page .content-inner {
+  max-width: 1440px;
+}
+
+.docentes-heading,
+.docente-profile-card,
+.empty-profile-card {
+  background: #fff;
+  padding: 22px 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 39, 66, 0.08);
+  margin-bottom: 20px;
+}
+
+.docentes-heading p,
+.empty-profile-card p,
+.docente-profile-card p,
+.docente-profile-actions p,
+.modal-title-row p {
+  margin: 6px 0 0;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.docentes-stats {
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+}
+
+.docentes-controls {
+  align-items: flex-start;
+}
+
+.docentes-filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.docentes-filters .filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 300px;
+  background: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  padding: 12px 16px;
+}
+
+.docentes-filters .filter-group input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 15px;
+  color: #0f2742;
+  background: transparent;
+}
+
+.docentes-filters select {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  font-size: 15px;
+  min-width: 210px;
+  background: #fff;
+  color: #0f2742;
+}
+
+.btn-inline,
+.btn-new,
+.profile-buttons button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.docentes-table-wrapper {
+  overflow-x: auto;
+}
+
+.docentes-table {
+  width: 100%;
+  min-width: 1280px;
+  border-collapse: collapse;
+}
+
+.docentes-table th,
+.docentes-table td {
+  padding: 16px 14px;
+  border-bottom: 1px solid #eef2f6;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.docentes-table thead th {
+  color: #6b7280;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.docentes-table tbody tr:hover {
+  background: linear-gradient(90deg, rgba(0, 86, 179, 0.05), rgba(0, 86, 179, 0.02));
+}
+
+.docente-name {
+  font-weight: 800;
+  color: #0f2742;
+}
+
+.docente-muted {
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+.estado-docente-badge,
+.yes-pill,
+.no-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.estado-docente-badge.pendiente {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.estado-docente-badge.revision {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.estado-docente-badge.observado {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.estado-docente-badge.habilitado {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.estado-docente-badge.rechazado {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.estado-docente-badge.inactivo {
+  background: #374151;
+  color: #fff;
+}
+
+.yes-pill {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.no-pill {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.docente-action-approve {
+  color: #16a34a;
+}
+
+.docente-action-observe {
+  color: #f97316;
+}
+
+.docente-action-reject,
+.docente-action-inactive {
+  color: #dc2626;
+}
+
+.docente-modal-overlay {
+  z-index: 1100;
+}
+
+.docente-form-modal {
+  width: min(960px, 100%);
+}
+
+.docente-action-modal {
+  width: min(640px, 100%);
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.modal-title-row h3 {
+  margin: 0;
+}
+
+.docente-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 700;
+  color: #0f2742;
+}
+
+.form-field.full,
+.docente-form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #dbe4ef;
+  background: #fff;
+  color: #0f2742;
+  font-size: 15px;
+  font-family: Inter, Arial, sans-serif;
+}
+
+.form-field input:disabled {
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: none;
+  border-color: #003b73;
+  box-shadow: 0 0 0 3px rgba(0, 59, 115, 0.1);
+}
+
+.field-help {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.switch-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #dbe4ef;
+  border-radius: 12px;
+  font-weight: 800;
+  background: #f8fafc;
+}
+
+.switch-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: #003b73;
+}
+
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.file-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 1px dashed #9bb5cf;
+  border-radius: 12px;
+  color: #003b73;
+  font-weight: 800;
+  background: #f8fbff;
+  cursor: pointer;
+}
+
+.file-field span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-field input {
+  display: none;
+}
+
+.detail-hero,
+.docente-profile-card,
+.docente-profile-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.detail-hero {
+  background: #f8fbff;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.detail-hero h4,
+.documents-section h4,
+.docente-profile-card h2,
+.empty-profile-card h3,
+.docente-profile-actions h3 {
+  margin: 0;
+  color: #003b73;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.detail-grid div,
+.observation-box,
+.document-row {
+  background: #fff;
+  border: 1px solid #e6eef6;
+  border-radius: 12px;
+  padding: 14px;
+}
+
+.detail-grid span,
+.observation-box span,
+.document-row span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.detail-grid strong,
+.document-row strong {
+  color: #0f2742;
+}
+
+.observation-box {
+  margin: 16px 0;
+}
+
+.observation-box p {
+  margin: 0;
+  color: #0f2742;
+}
+
+.documents-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.document-row a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #003b73;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.docente-profile-card {
+  margin-bottom: 18px;
+}
+
+.profile-status {
+  display: flex;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 8px;
+  color: #64748b;
+}
+
+.empty-profile-card {
+  text-align: left;
+}
+
+.docente-alert {
+  padding: 14px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.docente-alert.info {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.docente-alert.warning {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.docente-alert.success {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.docente-alert.error {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.docente-alert.muted {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.profile-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+@media (max-width: 1180px) {
+  .docentes-stats {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .docentes-page .app-sidebar {
+    display: none;
+  }
+
+  .docentes-controls,
+  .docentes-filters,
+  .docente-profile-card,
+  .docente-profile-actions,
+  .detail-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .docentes-filters .filter-group,
+  .docentes-filters select,
+  .docentes-filters button,
+  .docentes-controls .btn-primary,
+  .profile-buttons button {
+    width: 100%;
+  }
+
+  .profile-status {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .docentes-stats,
+  .docente-form-grid,
+  .file-grid,
+  .detail-grid,
+  .documents-list {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-title-row {
+    align-items: flex-start;
+  }
+
+  .docentes-filters .filter-group {
+    min-width: 0;
+  }
+}
