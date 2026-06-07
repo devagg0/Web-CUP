@@ -7,7 +7,12 @@ import Carreras from './pages/Carreras';
 import Materias from './pages/Materias';
 import GestionDocentes from './pages/GestionDocentes';
 import GestionGruposCup from './pages/GestionGruposCup';
+import AsignacionDocentes from './pages/AsignacionDocentes';
+import CargaHorariaAulas from './pages/CargaHorariaAulas';
 import MiPerfilDocente from './pages/MiPerfilDocente';
+import MisGruposAsignadosDocente from './pages/MisGruposAsignadosDocente';
+import MiCargaHorariaDocente from './pages/MiCargaHorariaDocente';
+import MisAsistenciasDocente from './pages/MisAsistenciasDocente';
 import Preinscripcion from './pages/Preinscripcion';
 import ConsultaPreinscripcion from './pages/ConsultaPreinscripcion';
 import AdminPreinscripciones from './pages/AdminPreinscripciones';
@@ -131,10 +136,50 @@ function App() {
           }
         />
         <Route
+          path="/asignacion-docentes"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <AsignacionDocentes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/carga-horaria-aulas"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <CargaHorariaAulas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/docente/mi-perfil"
           element={
             <ProtectedRoute requiredRole="docente">
               <MiPerfilDocente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/docente/mis-grupos"
+          element={
+            <ProtectedRoute requiredRole="docente">
+              <MisGruposAsignadosDocente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/docente/mi-carga-horaria"
+          element={
+            <ProtectedRoute requiredRole="docente">
+              <MiCargaHorariaDocente />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/docente/mis-asistencias"
+          element={
+            <ProtectedRoute requiredRole="docente">
+              <MisAsistenciasDocente />
             </ProtectedRoute>
           }
         />

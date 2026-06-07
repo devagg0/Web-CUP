@@ -29,4 +29,9 @@ class GrupoCup extends Model
         return $this->belongsToMany(Postulante::class, 'grupo_postulante', 'grupo_id', 'postulante_id')
             ->withTimestamps();
     }
+
+    public function asignacionesDocentes()
+    {
+        return $this->hasMany(AsignacionDocenteGrupo::class, 'grupo_id');
+    }
 }

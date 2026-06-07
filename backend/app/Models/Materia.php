@@ -24,4 +24,9 @@ class Materia extends Model
     {
         return $this->hasMany(Docente::class);
     }
+
+    public function asignacionesDocentesGrupo()
+    {
+        return $this->hasMany(AsignacionDocenteGrupo::class, 'materia_id');
+    }
 }

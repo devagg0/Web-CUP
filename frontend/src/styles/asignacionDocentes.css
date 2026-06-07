@@ -1,0 +1,487 @@
+.asignacion-docentes-page .content-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.asignacion-docentes-page .btn-primary,
+.asignacion-form-modal .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: #003b73;
+  color: #fff;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.asignacion-docentes-page .btn-primary:hover:not(:disabled),
+.asignacion-form-modal .btn-primary:hover:not(:disabled) {
+  background: #002f5d;
+  transform: translateY(-1px);
+}
+
+.asignacion-docentes-page .btn-secondary,
+.asignacion-form-modal .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #003b73;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.asignacion-docentes-page .btn-secondary:hover:not(:disabled),
+.asignacion-form-modal .btn-secondary:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #93a4b8;
+}
+
+.asignacion-docentes-page .btn-ghost {
+  min-height: 42px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #003b73;
+  padding: 0 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.asignacion-docentes-page button:disabled,
+.asignacion-form-modal button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.asignacion-docentes-page .message,
+.asignacion-form-modal .message {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.asignacion-docentes-page .message.success {
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+.asignacion-docentes-page .message.error,
+.asignacion-form-modal .message.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.asignacion-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.asignacion-heading p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.docente-view-heading {
+  align-items: flex-start;
+}
+
+.asignacion-stats {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.docente-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.asignacion-controls {
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.asignacion-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr)) auto auto;
+  gap: 12px;
+  flex: 1;
+}
+
+.asignacion-filters select,
+.asignacion-form-grid select {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #d8dee9;
+  border-radius: 8px;
+  background: #fff;
+  color: #111827;
+  padding: 0 12px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.asignacion-filters select:focus,
+.asignacion-form-grid select:focus {
+  border-color: #003b73;
+  box-shadow: 0 0 0 3px rgba(0, 59, 115, 0.12);
+}
+
+.asignacion-filters select:disabled,
+.asignacion-form-grid select:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.asignacion-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.asignacion-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.asignacion-table th {
+  background: #f8fafc;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: uppercase;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.asignacion-table td {
+  color: #1f2937;
+  font-size: 14px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+}
+
+.asignacion-table tbody tr:hover {
+  background: #f9fbfd;
+}
+
+.asignacion-table td strong {
+  display: block;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.asignacion-table td span {
+  display: block;
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.estado-asignacion-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 74px;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.estado-asignacion-badge.activa {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.estado-asignacion-badge.inactiva {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #d8dee9;
+  border-radius: 8px;
+  background: #fff;
+  color: #003b73;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.icon-action:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+
+.icon-action.danger {
+  color: #dc2626;
+}
+
+.icon-action.danger:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.icon-action.success {
+  color: #16a34a;
+}
+
+.icon-action.success:hover:not(:disabled) {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.icon-action:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.empty-state,
+.table-loading {
+  padding: 34px 20px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.asignacion-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.asignacion-form-modal,
+.asignacion-detail-modal {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 60px rgba(15, 39, 66, 0.2);
+  padding: 24px;
+}
+
+.modal-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.modal-title-row h3 {
+  margin: 0;
+  color: #003b73;
+  font-size: 22px;
+}
+
+.modal-title-row p {
+  margin: 6px 0 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  background: #f3f6fa;
+  color: #0f2742;
+  cursor: pointer;
+}
+
+.detail-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f8fafc;
+  padding: 16px;
+}
+
+.detail-hero h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.detail-hero span {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.detail-grid div {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px;
+}
+
+.detail-grid span {
+  display: block;
+  margin-bottom: 5px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.detail-grid strong {
+  color: #111827;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.asignacion-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.asignacion-form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.field-help {
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.field-error {
+  color: #dc2626;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+.detail-section-title {
+  margin: 20px 0 10px;
+  color: #003b73;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.detail-grid.compact {
+  grid-template-columns: 1fr;
+}
+
+@media (max-width: 1180px) {
+  .asignacion-filters {
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+  }
+
+  .asignacion-stats,
+  .docente-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .asignacion-heading,
+  .asignacion-controls,
+  .docente-view-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .asignacion-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .asignacion-stats,
+  .docente-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .asignacion-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .form-actions button,
+  .asignacion-controls .btn-primary,
+  .asignacion-heading .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}

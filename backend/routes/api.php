@@ -1,7 +1,11 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AsignacionDocenteGrupoController;
+use App\Http\Controllers\AsistenciaDocenteController;
+use App\Http\Controllers\AulaController;
 use App\Http\Controllers\CarreraController;
+use App\Http\Controllers\CargaHorariaController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\GrupoCupController;
 use App\Http\Controllers\ImportacionPostulantesController;
@@ -68,6 +72,18 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad'])->group(function () {
     Route::get('/admin/grupos-cup/resumen', [GrupoCupController::class, 'resumen']);
     Route::get('/admin/grupos-cup', [GrupoCupController::class, 'index']);
+
+    Route::get('/admin/aulas', [AulaController::class, 'index']);
+    Route::get('/admin/aulas/{aula}', [AulaController::class, 'show']);
+
+    Route::get('/admin/cargas-horarias/resumen', [CargaHorariaController::class, 'resumen']);
+    Route::get('/admin/cargas-horarias/asignaciones-disponibles', [CargaHorariaController::class, 'asignacionesDisponibles']);
+    Route::get('/admin/cargas-horarias/aulas-disponibles', [CargaHorariaController::class, 'aulasDisponibles']);
+    Route::get('/admin/cargas-horarias', [CargaHorariaController::class, 'index']);
+    Route::get('/admin/cargas-horarias/{carga}', [CargaHorariaController::class, 'show']);
+
+    Route::get('/admin/asistencias-docente', [AsistenciaDocenteController::class, 'adminIndex']);
+    Route::get('/admin/asistencias-docente/{asistencia}', [AsistenciaDocenteController::class, 'show']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->group(function () {
@@ -81,6 +97,11 @@ Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autorid
     Route::get('/admin/docentes/habilitados', [DocenteController::class, 'habilitados']);
     Route::get('/admin/docentes/usuarios-disponibles', [DocenteController::class, 'usuariosDisponibles']);
     Route::get('/admin/docentes/{docente}', [DocenteController::class, 'show']);
+
+    Route::get('/admin/asignaciones-docentes/resumen', [AsignacionDocenteGrupoController::class, 'resumen']);
+    Route::get('/admin/asignaciones-docentes/docentes-disponibles', [AsignacionDocenteGrupoController::class, 'docentesDisponibles']);
+    Route::get('/admin/asignaciones-docentes', [AsignacionDocenteGrupoController::class, 'index']);
+    Route::get('/admin/asignaciones-docentes/{asignacion}', [AsignacionDocenteGrupoController::class, 'show']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->group(function () {
@@ -93,12 +114,30 @@ Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->gro
     Route::post('/admin/docentes/{docente}/observar', [DocenteController::class, 'observar']);
     Route::post('/admin/docentes/{docente}/rechazar', [DocenteController::class, 'rechazar']);
     Route::post('/admin/docentes/{docente}/inactivar', [DocenteController::class, 'inactivar']);
+
+    Route::post('/admin/asignaciones-docentes', [AsignacionDocenteGrupoController::class, 'store']);
+    Route::post('/admin/asignaciones-docentes/{asignacion}/inactivar', [AsignacionDocenteGrupoController::class, 'inactivar']);
+    Route::post('/admin/asignaciones-docentes/{asignacion}/reactivar', [AsignacionDocenteGrupoController::class, 'reactivar']);
+
+    Route::post('/admin/aulas', [AulaController::class, 'store']);
+    Route::post('/admin/aulas/{aula}/actualizar', [AulaController::class, 'update']);
+    Route::post('/admin/aulas/{aula}/inactivar', [AulaController::class, 'inactivar']);
+    Route::post('/admin/aulas/{aula}/activar', [AulaController::class, 'activar']);
+
+    Route::post('/admin/cargas-horarias', [CargaHorariaController::class, 'store']);
+    Route::post('/admin/cargas-horarias/{carga}/actualizar', [CargaHorariaController::class, 'update']);
+    Route::post('/admin/cargas-horarias/{carga}/inactivar', [CargaHorariaController::class, 'inactivar']);
+    Route::post('/admin/cargas-horarias/{carga}/activar', [CargaHorariaController::class, 'activar']);
 });
 
 Route::middleware(['auth:sanctum', 'role:docente'])->group(function () {
     Route::get('/docente/mi-perfil', [DocenteController::class, 'miPerfil']);
     Route::post('/docente/mi-perfil', [DocenteController::class, 'guardarMiPerfil']);
     Route::post('/docente/mi-perfil/enviar-revision', [DocenteController::class, 'enviarMiPerfilRevision']);
+    Route::get('/docente/mis-grupos-asignados', [AsignacionDocenteGrupoController::class, 'misGruposAsignados']);
+    Route::get('/docente/mi-carga-horaria', [CargaHorariaController::class, 'miCargaHoraria']);
+    Route::post('/docente/cargas-horarias/{carga}/registrar-asistencia', [AsistenciaDocenteController::class, 'registrar']);
+    Route::get('/docente/asistencias', [AsistenciaDocenteController::class, 'misAsistencias']);
 });
 
 Route::get('/ping', function () {

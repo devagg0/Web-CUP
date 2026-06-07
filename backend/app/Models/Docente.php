@@ -71,6 +71,16 @@ class Docente extends Model
         return $this->belongsTo(User::class, 'aprobado_por');
     }
 
+    public function asignacionesGrupo()
+    {
+        return $this->hasMany(AsignacionDocenteGrupo::class, 'docente_id');
+    }
+
+    public function asistenciasDocente()
+    {
+        return $this->hasMany(AsistenciaDocente::class, 'docente_id');
+    }
+
     public function getTituloProfesionalUrlAttribute(): ?string
     {
         return $this->publicUrl($this->titulo_profesional_path);
