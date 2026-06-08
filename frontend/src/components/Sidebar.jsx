@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound, UserCheck, CalendarCheck, Clock } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
@@ -11,6 +10,7 @@ export default function Sidebar() {
   const canViewGruposCup = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
   const canViewAsignacionesDocentes = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
   const canViewCargaHorariaAulas = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
+  const canViewEvaluacionesNotas = ['admin', 'administrador', 'coordinador', 'docente', 'autoridad'].includes(role);
 
   return (
     <aside className="app-sidebar">
@@ -65,6 +65,11 @@ export default function Sidebar() {
             <CalendarCheck size={18} /> <span>Carga horaria y aulas</span>
           </NavLink>
         )}
+        {canViewEvaluacionesNotas && (
+          <NavLink to="/evaluaciones-notas" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <ClipboardList size={18} /> <span>Evaluaciones y notas</span>
+          </NavLink>
+        )}
         {role === 'docente' && (
           <NavLink to="/docente/mi-perfil" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <UserRound size={18} /> <span>Mi perfil docente</span>
@@ -83,6 +88,16 @@ export default function Sidebar() {
         {role === 'docente' && (
           <NavLink to="/docente/mis-asistencias" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <CalendarCheck size={18} /> <span>Mis asistencias</span>
+          </NavLink>
+        )}
+        {role === 'postulante' && (
+          <NavLink to="/postulante/mi-grupo-horario" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <Clock size={18} /> <span>Mi horario</span>
+          </NavLink>
+        )}
+        {role === 'postulante' && (
+          <NavLink to="/postulante/mis-notas" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <GraduationCap size={18} /> <span>Mis notas</span>
           </NavLink>
         )}
       </nav>

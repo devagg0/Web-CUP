@@ -28,22 +28,67 @@ const getGrupo = (asignacion) => asignacion?.grupo || asignacion?.grupo_cup || a
 
 const getMateria = (asignacion) => asignacion?.materia || {};
 
-const getDocente = (asignacion) => asignacion?.docente || {};
+const getDocente = (asignacion) =>
+  asignacion?.docente
+  || asignacion?.docente_perfil
+  || asignacion?.asignacion?.docente
+  || asignacion?.asignacion_docente?.docente
+  || {};
+
+const getProfesionDocente = (asignacion) => {
+  const docente = getDocente(asignacion);
+  return docente?.profesion
+    ?? docente?.perfil?.profesion
+    ?? docente?.docente?.profesion
+    ?? docente?.datos_docente?.profesion
+    ?? docente?.perfil_docente?.profesion
+    ?? asignacion?.docente_perfil?.profesion
+    ?? asignacion?.asignacion?.docente?.profesion
+    ?? 'No registrado';
+};
+
+const getEspecialidadDocente = (asignacion) => {
+  const docente = getDocente(asignacion);
+  return docente?.especialidad
+    ?? docente?.perfil?.especialidad
+    ?? docente?.docente?.especialidad
+    ?? docente?.datos_docente?.especialidad
+    ?? docente?.perfil_docente?.especialidad
+    ?? asignacion?.docente_perfil?.especialidad
+    ?? asignacion?.asignacion?.docente?.especialidad
+    ?? 'No registrado';
+};
 
 const getMateriaNombre = (materia) => materia?.nombre || materia?.nombre_materia || materia?.materia || 'Sin materia';
 
 const getGruposAsignados = (asignacion) => {
+  const docente = getDocente(asignacion);
   return asignacion.grupos_asignados_docente
     ?? asignacion.grupos_asignados
     ?? asignacion.asignaciones_activas_docente
-    ?? asignacion.docente?.grupos_asignados
-    ?? asignacion.docente?.asignaciones_activas
+    ?? asignacion.total_grupos_asignados
+    ?? asignacion.grupos_asignados_actuales
+    ?? asignacion.asignaciones_grupo_count
+    ?? asignacion.asignaciones_activas_count
+    ?? docente?.grupos_asignados
+    ?? docente?.grupos_asignados_docente
+    ?? docente?.asignaciones_activas
+    ?? docente?.total_grupos_asignados
+    ?? docente?.grupos_asignados_actuales
+    ?? docente?.asignaciones_grupo_count
+    ?? docente?.asignaciones_activas_count
+    ?? docente?.asignaciones?.length
     ?? 0;
 };
 
 const getMaxGrupos = (asignacion) => {
+  const docente = getDocente(asignacion);
   return asignacion.capacidad_grupos_maxima
     ?? asignacion.max_grupos
+    ?? asignacion.maximo_grupos
+    ?? docente?.capacidad_grupos_maxima
+    ?? docente?.max_grupos
+    ?? docente?.maximo_grupos
     ?? 4;
 };
 
@@ -105,8 +150,8 @@ export default function AsignacionDocenteDetailModal({ asignacion, onClose }) {
         <div className="detail-grid">
           <div><span>Nombre</span><strong>{fullName(docente)}</strong></div>
           <div><span>Correo</span><strong>{getCorreo(docente) || 'No registrado'}</strong></div>
-          <div><span>Profesion</span><strong>{text(docente.profesion)}</strong></div>
-          <div><span>Especialidad</span><strong>{text(docente.especialidad)}</strong></div>
+          <div><span>Profesion</span><strong>{getProfesionDocente(asignacion)}</strong></div>
+          <div><span>Especialidad</span><strong>{getEspecialidadDocente(asignacion)}</strong></div>
           <div><span>Materia habilitada</span><strong>{getMateriaNombre(materiaHabilitada)}</strong></div>
           <div><span>Grupos asignados</span><strong>{getGruposAsignados(asignacion)} / {getMaxGrupos(asignacion)}</strong></div>
         </div>

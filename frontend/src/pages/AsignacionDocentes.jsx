@@ -22,7 +22,7 @@ const emptyResumen = {
 
 const extractPayload = (response) => response?.data || response || {};
 
-const extractList = (response) => {
+const normalizeList = (response) => {
   const payload = response?.data ?? response;
 
   return Array.isArray(payload)
@@ -71,7 +71,12 @@ const getGrupo = (asignacion) => asignacion?.grupo || asignacion?.grupo_cup || a
 
 const getMateria = (asignacion) => asignacion?.materia || {};
 
-const getDocente = (asignacion) => asignacion?.docente || {};
+const getDocente = (asignacion) =>
+  asignacion?.docente
+  || asignacion?.docente_perfil
+  || asignacion?.asignacion?.docente
+  || asignacion?.asignacion_docente?.docente
+  || {};
 
 const getUser = (docente) => docente?.user || docente?.usuario || {};
 
@@ -90,17 +95,33 @@ const fullName = (docente) => {
 const getCorreo = (docente) => docente?.correo || docente?.email || getUser(docente).email || getUser(docente).correo || 'Sin correo';
 
 const getGruposCount = (asignacion) => {
+  const docente = getDocente(asignacion);
   return asignacion.grupos_asignados_docente
     ?? asignacion.grupos_asignados
     ?? asignacion.asignaciones_activas_docente
-    ?? asignacion.docente?.grupos_asignados
-    ?? asignacion.docente?.asignaciones_activas
+    ?? asignacion.total_grupos_asignados
+    ?? asignacion.grupos_asignados_actuales
+    ?? asignacion.asignaciones_grupo_count
+    ?? asignacion.asignaciones_activas_count
+    ?? docente?.grupos_asignados
+    ?? docente?.grupos_asignados_docente
+    ?? docente?.asignaciones_activas
+    ?? docente?.total_grupos_asignados
+    ?? docente?.grupos_asignados_actuales
+    ?? docente?.asignaciones_grupo_count
+    ?? docente?.asignaciones_activas_count
+    ?? docente?.asignaciones?.length
     ?? 0;
 };
 
 const getMaxGrupos = (asignacion) => {
+  const docente = getDocente(asignacion);
   return asignacion.capacidad_grupos_maxima
     ?? asignacion.max_grupos
+    ?? asignacion.maximo_grupos
+    ?? docente?.capacidad_grupos_maxima
+    ?? docente?.max_grupos
+    ?? docente?.maximo_grupos
     ?? 4;
 };
 
@@ -142,9 +163,7 @@ export default function AsignacionDocentes() {
 
   const loadAsignaciones = async (nextFilters = filters) => {
     const response = await asignacionService.getAsignacionesDocentes(cleanParams(nextFilters));
-    const asignacionesArray = extractList(response);
-    console.log('Asignaciones normalizadas:', asignacionesArray);
-    console.log('Primera asignacion:', asignacionesArray[0]);
+    const asignacionesArray = normalizeList(response);
     setAsignaciones(asignacionesArray);
   };
 
@@ -153,8 +172,8 @@ export default function AsignacionDocentes() {
       gruposCupService.getGruposCup(),
       materiasService.getMateriasActivas(),
     ]);
-    setGrupos(extractList(gruposResponse));
-    setMaterias(extractList(materiasResponse));
+    setGrupos(normalizeList(gruposResponse));
+    setMaterias(normalizeList(materiasResponse));
   };
 
   const loadData = async (nextFilters = filters) => {
@@ -227,7 +246,11 @@ export default function AsignacionDocentes() {
     setError('');
     try {
       const response = await asignacionService.getAsignacionDocente(asignacion.id);
-      setDetail(extractPayload(response).asignacion || extractPayload(response).asignacion_docente || extractPayload(response));
+      const payload = extractPayload(response);
+      setDetail({
+        ...asignacion,
+        ...(payload.asignacion || payload.asignacion_docente || payload),
+      });
     } catch (e) {
       setError(getBackendError(e, 'No se pudo cargar el detalle de la asignación.'));
     }

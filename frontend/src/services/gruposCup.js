@@ -15,6 +15,11 @@ export async function getGrupoCup(id) {
   return response.data;
 }
 
+export async function getHorarioGrupoCup(id) {
+  const response = await api.get(`/admin/grupos-cup/${id}/horario`);
+  return response.data;
+}
+
 export async function generarGruposCup() {
   const response = await api.post('/admin/grupos-cup/generar');
   return response.data;
@@ -29,6 +34,7 @@ export default {
   getResumenGruposCup,
   getGruposCup,
   getGrupoCup,
+  getHorarioGrupoCup,
   generarGruposCup,
   inactivarGrupoCup,
 };

@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Ban, Eye, PlayCircle, RefreshCcw, Search } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
 import StatCard from '../components/StatCard';
 import EstadoGrupoBadge from '../components/EstadoGrupoBadge';
-import GrupoCupDetailModal from '../components/GrupoCupDetailModal';
+import GrupoHorarioAdminModal from '../components/GrupoHorarioAdminModal';
 import * as gruposCupService from '../services/gruposCup';
 import '../styles/gruposCup.css';
 
@@ -35,7 +35,7 @@ const getRole = () => {
     const stored = sessionStorage.getItem('user');
     const user = stored ? JSON.parse(stored) : null;
     return user?.role?.toLowerCase() || '';
-  } catch (e) {
+  } catch {
     return '';
   }
 };
@@ -82,14 +82,14 @@ export default function GestionGruposCup() {
   const [filters, setFilters] = useState({ search: '', estado: '' });
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
-  const [detail, setDetail] = useState(null);
+  const [horarioDetail, setHorarioDetail] = useState(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
   const role = getRole();
   const canManage = manageRoles.includes(role);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -104,11 +104,15 @@ export default function GestionGruposCup() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    loadData();
-  }, []);
+    const timer = window.setTimeout(() => {
+      loadData();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [loadData]);
 
   const filteredGrupos = useMemo(() => {
     const query = filters.search.trim().toLowerCase();
@@ -151,14 +155,14 @@ export default function GestionGruposCup() {
     }
   };
 
-  const handleViewDetail = async (grupo) => {
+  const handleViewHorario = async (grupo) => {
     setMessage('');
     setError('');
     try {
-      const response = await gruposCupService.getGrupoCup(grupo.id);
-      setDetail(response);
+      const response = await gruposCupService.getHorarioGrupoCup(grupo.id);
+      setHorarioDetail(response);
     } catch (e) {
-      setError(getBackendError(e, 'Error al cargar estudiantes del grupo.'));
+      setError(getBackendError(e, 'Error al cargar horario del grupo.'));
     }
   };
 
@@ -266,7 +270,7 @@ export default function GestionGruposCup() {
                         <td>{formatDate(grupo.created_at)}</td>
                         <td>
                           <div className="row-actions">
-                            <button className="icon-action" type="button" onClick={() => handleViewDetail(grupo)} title="Ver estudiantes">
+                            <button className="icon-action" type="button" onClick={() => handleViewHorario(grupo)} title="Ver horario">
                               <Eye size={17} />
                             </button>
                             {canManage && (
@@ -291,7 +295,7 @@ export default function GestionGruposCup() {
           </div>
         </div>
 
-        <GrupoCupDetailModal detail={detail} onClose={() => setDetail(null)} />
+        <GrupoHorarioAdminModal detail={horarioDetail} onClose={() => setHorarioDetail(null)} />
       </main>
     </div>
   );

@@ -68,4 +68,9 @@ class Postulante extends Model
         return $this->belongsToMany(GrupoCup::class, 'grupo_postulante', 'postulante_id', 'grupo_id')
             ->withTimestamps();
     }
+
+    public function examenesCup()
+    {
+        return $this->hasMany(ExamenCUP::class, 'postulante_id');
+    }
 }

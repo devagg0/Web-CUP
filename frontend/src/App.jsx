@@ -19,53 +19,56 @@ import AdminPreinscripciones from './pages/AdminPreinscripciones';
 import AdminPagosPreinscripcion from './pages/AdminPagosPreinscripcion';
 import CambiarPassword from './pages/CambiarPassword';
 import PerfilPostulante from './pages/PerfilPostulante';
+import ConsultarGrupoHorario from './pages/ConsultarGrupoHorario';
+import EvaluacionesNotas from './pages/EvaluacionesNotas';
+import MisNotasCup from './pages/MisNotasCup';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
-function App() {
-  const RootRedirect = () => {
-    const navigate = useNavigate();
+function RootRedirect() {
+  const navigate = useNavigate();
 
-    useEffect(() => {
-      let mounted = true;
-      const token = sessionStorage.getItem('token');
+  useEffect(() => {
+    let mounted = true;
+    const token = sessionStorage.getItem('token');
 
-      if (!token) {
+    if (!token) {
+      navigate('/login', { replace: true });
+      return undefined;
+    }
+
+    validateToken().then((ok) => {
+      if (!mounted) return;
+      if (!ok) {
         navigate('/login', { replace: true });
         return;
       }
 
-      validateToken().then((ok) => {
-        if (!mounted) return;
-        if (!ok) {
-          navigate('/login', { replace: true });
-          return;
-        }
+      let user;
+      try {
+        const stored = sessionStorage.getItem('user');
+        user = stored ? JSON.parse(stored) : null;
+      } catch {
+        user = null;
+      }
+      if (user?.debe_cambiar_password) {
+        navigate('/cambiar-password', { replace: true });
+      } else if (user?.role === 'postulante') {
+        navigate('/perfil-postulante', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    });
 
-        let user = null;
-        try {
-          const stored = sessionStorage.getItem('user');
-          user = stored ? JSON.parse(stored) : null;
-        } catch (e) {
-          user = null;
-        }
-        if (user?.debe_cambiar_password) {
-          navigate('/cambiar-password', { replace: true });
-        } else if (user?.role === 'postulante') {
-          navigate('/perfil-postulante', { replace: true });
-        } else {
-          navigate('/dashboard', { replace: true });
-        }
-      });
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
 
-      return () => {
-        mounted = false;
-      };
-    }, [navigate]);
+  return null;
+}
 
-    return null;
-  };
-
+function App() {
   return (
     <BrowserRouter>
       <Routes>
@@ -84,6 +87,22 @@ function App() {
           element={
             <ProtectedRoute>
               <PerfilPostulante />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/postulante/mi-grupo-horario"
+          element={
+            <ProtectedRoute requiredRole="postulante">
+              <ConsultarGrupoHorario />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/postulante/mis-notas"
+          element={
+            <ProtectedRoute requiredRole="postulante">
+              <MisNotasCup />
             </ProtectedRoute>
           }
         />
@@ -148,6 +167,14 @@ function App() {
           element={
             <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
               <CargaHorariaAulas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/evaluaciones-notas"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'docente', 'autoridad']}>
+              <EvaluacionesNotas />
             </ProtectedRoute>
           }
         />

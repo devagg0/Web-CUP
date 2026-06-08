@@ -15,6 +15,35 @@ const fullName = (user) => {
 
 const materiaName = (docente) => docente?.materia?.nombre || docente?.materia_habilitada?.nombre || docente?.materia_nombre || 'Sin materia';
 
+const getDocenteCorreo = (docente) =>
+  docente?.correo
+  ?? docente?.email
+  ?? docente?.user?.email
+  ?? docente?.user?.correo
+  ?? docente?.usuario?.email
+  ?? docente?.usuario?.correo
+  ?? docente?.user_email
+  ?? docente?.usuario_email
+  ?? 'Sin correo';
+
+const getGruposAsignadosDocente = (docente) =>
+  docente?.grupos_asignados
+  ?? docente?.grupos_asignados_docente
+  ?? docente?.asignaciones_activas
+  ?? docente?.total_grupos_asignados
+  ?? docente?.grupos_asignados_actuales
+  ?? docente?.asignaciones_grupo_count
+  ?? docente?.asignaciones_activas_count
+  ?? docente?.grupos_asignados_count
+  ?? docente?.asignaciones?.length
+  ?? 0;
+
+const getMaxGruposDocente = (docente) =>
+  docente?.capacidad_grupos_maxima
+  ?? docente?.max_grupos
+  ?? docente?.maximo_grupos
+  ?? 4;
+
 const approverName = (docente) => {
   const user = docente?.aprobado_por || docente?.aprobador || {};
   return fullName(user) === 'Docente' ? 'No registrado' : fullName(user);
@@ -59,7 +88,7 @@ export default function DocenteDetailModal({ docente, onClose }) {
         <div className="detail-hero">
           <div>
             <h4>{fullName(user)}</h4>
-            <span>{user.email || user.correo || 'Sin correo'}</span>
+            <span>{getDocenteCorreo(docente)}</span>
           </div>
           <EstadoDocenteBadge estado={docente.estado_docente} />
         </div>
@@ -76,7 +105,7 @@ export default function DocenteDetailModal({ docente, onClose }) {
           <div><span>Fecha envío revisión</span><strong>{text(docente.fecha_envio_revision)}</strong></div>
           <div><span>Fecha aprobación</span><strong>{text(docente.fecha_aprobacion)}</strong></div>
           <div><span>Aprobado por</span><strong>{approverName(docente)}</strong></div>
-          <div><span>Grupos asignados actuales</span><strong>{docente.grupos_asignados_count || 0} / 4</strong></div>
+          <div><span>Grupos asignados actuales</span><strong>{getGruposAsignadosDocente(docente)} / {getMaxGruposDocente(docente)}</strong></div>
         </div>
 
         <div className="observation-box">

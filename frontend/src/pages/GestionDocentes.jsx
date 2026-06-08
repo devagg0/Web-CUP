@@ -22,7 +22,7 @@ const ESTADOS = [
 
 const manageRoles = ['admin', 'administrador', 'coordinador'];
 
-const extractList = (response) => {
+const normalizeList = (response) => {
   const payload = response?.data ?? response;
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload?.data)) return payload.data;
@@ -122,10 +122,9 @@ export default function GestionDocentes() {
     setError('');
     try {
       const cleanParams = getCleanParams(nextFilters);
-      console.log('Filtros docentes enviados:', cleanParams);
       const response = await docentesService.listarDocentes(cleanParams);
-      console.log('Respuesta docentes:', response);
-      setDocentes(filterDocentesLocally(extractList(response), cleanParams));
+      const docentesArray = normalizeList(response);
+      setDocentes(filterDocentesLocally(docentesArray, cleanParams));
     } catch (e) {
       setError(getBackendError(e, 'No se pudieron cargar los docentes.'));
     } finally {
@@ -140,10 +139,9 @@ export default function GestionDocentes() {
         materiasService.getMateriasActivas(),
         canManage ? docentesService.obtenerUsuariosDocentesDisponibles() : Promise.resolve([]),
       ]);
-      const materiasArray = extractList(materiasResponse);
-      console.log('Materias activas normalizadas:', materiasArray);
+      const materiasArray = normalizeList(materiasResponse);
       setMaterias(materiasArray);
-      setUsuarios(extractList(usuariosResponse));
+      setUsuarios(normalizeList(usuariosResponse));
     } catch (e) {
       setError(getBackendError(e, 'No se pudieron cargar los datos de apoyo.'));
     } finally {
@@ -214,7 +212,10 @@ export default function GestionDocentes() {
   const loadDetail = async (docente) => {
     try {
       const response = await docentesService.obtenerDocente(docente.id);
-      setDetail(extractOne(response));
+      setDetail({
+        ...docente,
+        ...extractOne(response),
+      });
     } catch (e) {
       setError(getBackendError(e, 'No se pudo cargar el detalle del docente.'));
     }

@@ -7,6 +7,8 @@ use App\Http\Controllers\AulaController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\CargaHorariaController;
 use App\Http\Controllers\DocenteController;
+use App\Http\Controllers\ExamenCUPController;
+use App\Http\Controllers\GrupoHorarioController;
 use App\Http\Controllers\GrupoCupController;
 use App\Http\Controllers\ImportacionPostulantesController;
 use App\Http\Controllers\ImportacionUsuariosController;
@@ -72,6 +74,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad'])->group(function () {
     Route::get('/admin/grupos-cup/resumen', [GrupoCupController::class, 'resumen']);
     Route::get('/admin/grupos-cup', [GrupoCupController::class, 'index']);
+    Route::get('/admin/grupos-cup/{grupo}/horario', [GrupoHorarioController::class, 'horarioGrupo']);
 
     Route::get('/admin/aulas', [AulaController::class, 'index']);
     Route::get('/admin/aulas/{aula}', [AulaController::class, 'show']);
@@ -84,6 +87,15 @@ Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autorid
 
     Route::get('/admin/asistencias-docente', [AsistenciaDocenteController::class, 'adminIndex']);
     Route::get('/admin/asistencias-docente/{asistencia}', [AsistenciaDocenteController::class, 'show']);
+});
+
+Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad,docente'])->group(function () {
+    Route::get('/admin/examenes-cup/resumen', [ExamenCUPController::class, 'resumen']);
+    Route::get('/admin/examenes-cup', [ExamenCUPController::class, 'index']);
+    Route::get('/admin/examenes-cup/{postulante}', [ExamenCUPController::class, 'showByPostulante']);
+    Route::post('/admin/examenes-cup', [ExamenCUPController::class, 'store']);
+    Route::post('/admin/examenes-cup/importar', [ExamenCUPController::class, 'importar']);
+    Route::put('/admin/examenes-cup/{examen}', [ExamenCUPController::class, 'update']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->group(function () {
@@ -138,6 +150,11 @@ Route::middleware(['auth:sanctum', 'role:docente'])->group(function () {
     Route::get('/docente/mi-carga-horaria', [CargaHorariaController::class, 'miCargaHoraria']);
     Route::post('/docente/cargas-horarias/{carga}/registrar-asistencia', [AsistenciaDocenteController::class, 'registrar']);
     Route::get('/docente/asistencias', [AsistenciaDocenteController::class, 'misAsistencias']);
+});
+
+Route::middleware(['auth:sanctum', 'role:postulante'])->group(function () {
+    Route::get('/postulante/mi-grupo-horario', [GrupoHorarioController::class, 'miGrupoHorario']);
+    Route::get('/postulante/mis-notas-cup', [ExamenCUPController::class, 'misNotasCup']);
 });
 
 Route::get('/ping', function () {

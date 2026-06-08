@@ -12,6 +12,35 @@ const materiaName = (docente) => docente?.materia?.nombre || docente?.materia_ha
 
 const boolLabel = (value) => (value ? 'Sí' : 'No');
 
+const getDocenteCorreo = (docente) =>
+  docente?.correo
+  ?? docente?.email
+  ?? docente?.user?.email
+  ?? docente?.user?.correo
+  ?? docente?.usuario?.email
+  ?? docente?.usuario?.correo
+  ?? docente?.user_email
+  ?? docente?.usuario_email
+  ?? 'Sin correo';
+
+const getGruposAsignadosDocente = (docente) =>
+  docente?.grupos_asignados
+  ?? docente?.grupos_asignados_docente
+  ?? docente?.asignaciones_activas
+  ?? docente?.total_grupos_asignados
+  ?? docente?.grupos_asignados_actuales
+  ?? docente?.asignaciones_grupo_count
+  ?? docente?.asignaciones_activas_count
+  ?? docente?.grupos_asignados_count
+  ?? docente?.asignaciones?.length
+  ?? 0;
+
+const getMaxGruposDocente = (docente) =>
+  docente?.capacidad_grupos_maxima
+  ?? docente?.max_grupos
+  ?? docente?.maximo_grupos
+  ?? 4;
+
 const actionsByEstado = {
   PERFIL_PENDIENTE: ['view', 'edit', 'send'],
   EN_REVISION: ['view', 'edit', 'approve', 'observe', 'reject'],
@@ -67,7 +96,7 @@ export default function DocentesTable({ docentes, canManage, onAction }) {
                   <div className="docente-name">{fullName(user)}</div>
                   <div className="docente-muted">{docente.telefono || 'Sin teléfono'}</div>
                 </td>
-                <td>{user.email || user.correo || docente.correo || 'Sin correo'}</td>
+                <td>{getDocenteCorreo(docente)}</td>
                 <td>{docente.ci || '-'}</td>
                 <td>{materiaName(docente)}</td>
                 <td>
@@ -77,7 +106,7 @@ export default function DocentesTable({ docentes, canManage, onAction }) {
                 <td><span className={docente.tiene_maestria ? 'yes-pill' : 'no-pill'}>{boolLabel(docente.tiene_maestria)}</span></td>
                 <td><span className={docente.tiene_diplomado ? 'yes-pill' : 'no-pill'}>{boolLabel(docente.tiene_diplomado)}</span></td>
                 <td><EstadoDocenteBadge estado={docente.estado_docente} /></td>
-                <td><strong>{docente.grupos_asignados_count || 0} / 4</strong></td>
+                <td><strong>{getGruposAsignadosDocente(docente)} / {getMaxGruposDocente(docente)}</strong></td>
                 <td>
                   <div className="actions-cell">
                     {getActions(docente.estado_docente).map((action) => {
