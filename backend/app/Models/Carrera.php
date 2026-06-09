@@ -36,4 +36,20 @@ class Carrera extends Model
     {
         return $this->hasMany(Postulante::class, 'segunda_carrera_id');
     }
+
+    public function admisionesPrimeraOpcion()
+    {
+        return $this->hasMany(AdmisionCUP::class, 'primera_carrera_id');
+    }
+
+    public function admisionesSegundaOpcion()
+    {
+        return $this->hasMany(AdmisionCUP::class, 'segunda_carrera_id');
+    }
+
+    public function admisionesAsignadas()
+    {
+        return $this->hasMany(AdmisionCUP::class, 'carrera_asignada_id');
+    }
 }
+

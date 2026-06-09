@@ -15,6 +15,7 @@ use App\Http\Controllers\ImportacionUsuariosController;
 use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\PreinscripcionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AdmisionCUPController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -155,6 +156,17 @@ Route::middleware(['auth:sanctum', 'role:docente'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:postulante'])->group(function () {
     Route::get('/postulante/mi-grupo-horario', [GrupoHorarioController::class, 'miGrupoHorario']);
     Route::get('/postulante/mis-notas-cup', [ExamenCUPController::class, 'misNotasCup']);
+});
+
+Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad'])->group(function () {
+    Route::get('/admin/admisiones-cup/resumen', [AdmisionCUPController::class, 'resumen']);
+    Route::get('/admin/admisiones-cup', [AdmisionCUPController::class, 'index']);
+    Route::get('/admin/admisiones-cup/{admision}', [AdmisionCUPController::class, 'show']);
+});
+
+Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->group(function () {
+    Route::post('/admin/admisiones-cup/procesar', [AdmisionCUPController::class, 'procesar']);
+    Route::post('/admin/admisiones-cup/reprocesar', [AdmisionCUPController::class, 'reprocesar']);
 });
 
 Route::get('/ping', function () {

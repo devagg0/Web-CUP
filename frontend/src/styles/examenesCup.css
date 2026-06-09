@@ -712,3 +712,155 @@
     width: calc(100vw - 18px);
   }
 }
+
+/* Estilos para el buscador visual de postulantes (Autocomplete) */
+.search-postulante-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  grid-column: span 2;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper input {
+  padding-right: 40px !important;
+}
+
+.search-input-wrapper .search-clear-btn {
+  position: absolute;
+  right: 12px;
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.search-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #dbe4ef;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 999;
+  margin-top: 5px;
+}
+
+.search-result-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #1e293b;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  text-align: left;
+}
+
+.search-result-item:last-child {
+  border-bottom: 0;
+}
+
+.search-result-item:hover {
+  background-color: #e8f1fb;
+  color: #003B73;
+}
+
+.search-no-results {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #64748b;
+  text-align: center;
+}
+
+.selected-student-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+  grid-column: span 2;
+  box-shadow: 0 4px 12px rgba(0, 59, 115, 0.05);
+}
+
+.selected-student-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.selected-student-info .student-name {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 15px;
+  text-align: left;
+}
+
+.selected-student-info .student-meta {
+  font-size: 13px;
+  color: #64748b;
+  text-align: left;
+}
+
+.selected-student-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.badge-inscrito {
+  background-color: #dcfce7;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.btn-remove-selection {
+  background: transparent;
+  border: 0;
+  color: #ef4444;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-remove-selection:hover {
+  background-color: #fee2e2;
+  transform: scale(1.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

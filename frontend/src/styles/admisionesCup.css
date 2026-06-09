@@ -1,0 +1,353 @@
+/* Estilos generales de la página de Admisiones */
+.admisiones-page .content-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.admisiones-heading {
+  align-items: flex-start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.admisiones-heading h2 {
+  color: #111827;
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 6px;
+}
+
+.admisiones-heading p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.admisiones-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.admisiones-controls {
+  background: #fff;
+  border: 1px solid #e5edf5;
+  border-radius: 8px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+  padding: 16px;
+}
+
+.admisiones-filters {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  width: 100%;
+  align-items: center;
+}
+
+.admisiones-filters select,
+.admisiones-filters input {
+  background: #fff;
+  border: 1px solid #dbe4ef;
+  border-radius: 8px;
+  color: #172033;
+  font-size: 14px;
+  min-height: 42px;
+  outline: none;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.admisiones-filters select:focus,
+.admisiones-filters input:focus {
+  border-color: #003B73;
+  box-shadow: 0 0 0 3px rgba(0, 59, 115, 0.12);
+}
+
+/* Sección de Cupos y Admitidos por Carrera */
+.carreras-cupos-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.carreras-cupos-title {
+  color: #334155;
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.carreras-cupos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.carrera-cupo-card {
+  background: #fff;
+  border: 1px solid #e5edf5;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.carrera-cupo-name {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.carrera-cupo-progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.carrera-cupo-progress-bar {
+  background: #f1f5f9;
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.carrera-cupo-progress-fill {
+  background: #003B73;
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+.carrera-cupo-details {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.carrera-cupo-details strong {
+  color: #1e293b;
+}
+
+/* Badges de Admisión */
+.admision-badge {
+  text-transform: none !important;
+  font-size: 12px !important;
+  letter-spacing: 0 !important;
+}
+
+.admision-badge.admitido-primera {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admision-badge.admitido-segunda {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.admision-badge.aprobado-sin-cupo {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.admision-badge.reprobado {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.admision-badge.pendiente {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Ranking and academic styling inside the table */
+.ranking-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e0f2fe;
+  color: #0369a1;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 800;
+  font-size: 13px;
+}
+
+.promedio-cell {
+  color: #0f766e;
+  font-weight: 800;
+}
+
+.estado-academico-label {
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+  text-transform: uppercase;
+}
+
+.estado-academico-label.aprobado {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.estado-academico-label.reprobado {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.estado-academico-label.pendiente {
+  background: #eceff1;
+  color: #37474f;
+}
+
+.text-primary-color {
+  color: #003B73;
+}
+
+.text-muted {
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: normal;
+}
+
+/* Modal Detalle Admisión */
+.admisiones-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.admisiones-detail-modal {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 800px;
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: modalEnter 0.25s ease-out;
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.admisiones-modal-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admisiones-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.admisiones-section-title {
+  grid-column: span 2;
+  font-size: 14px;
+  font-weight: 800;
+  color: #475569;
+  border-bottom: 1px solid #cbd5e1;
+  padding-bottom: 6px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+}
+
+.promedio-destacado {
+  color: #0f766e;
+  font-size: 18px !important;
+  font-weight: 900;
+}
+
+.estado-academico-text {
+  font-weight: 800;
+}
+
+.estado-academico-text.aprobado {
+  color: #166534;
+}
+
+.estado-academico-text.reprobado {
+  color: #991b1b;
+}
+
+.estado-academico-text.pendiente {
+  color: #475569;
+}
+
+.observacion-texto {
+  margin: 0;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+/* Modificación de estilos de StatCards específicas */
+.admisiones-stats .stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admisiones-stats .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .admisiones-heading {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .admisiones-modal-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admisiones-section-title {
+    grid-column: span 1;
+  }
+  
+  .detail-info-card.wide {
+    grid-column: span 1;
+  }
+}

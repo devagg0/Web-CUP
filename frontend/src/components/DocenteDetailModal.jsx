@@ -13,29 +13,38 @@ const fullName = (user) => {
   return parts.length ? parts.join(' ') : user.nombre_completo || user.email || 'Docente';
 };
 
+const getDocenteNombre = (docente) =>
+  docente?.nombre_usuario ??
+  docente?.nombre ??
+  docente?.nombre_completo ??
+  docente?.user?.name ??
+  docente?.usuario?.name ??
+  docente?.user?.nombre ??
+  docente?.usuario?.nombre ??
+  fullName(getUser(docente));
+
 const materiaName = (docente) => docente?.materia?.nombre || docente?.materia_habilitada?.nombre || docente?.materia_nombre || 'Sin materia';
 
 const getDocenteCorreo = (docente) =>
-  docente?.correo
-  ?? docente?.email
-  ?? docente?.user?.email
-  ?? docente?.user?.correo
-  ?? docente?.usuario?.email
-  ?? docente?.usuario?.correo
-  ?? docente?.user_email
-  ?? docente?.usuario_email
-  ?? 'Sin correo';
+  docente?.correo_usuario ??
+  docente?.correo ??
+  docente?.email ??
+  docente?.user?.email ??
+  docente?.usuario?.email ??
+  docente?.user?.correo ??
+  docente?.usuario?.correo ??
+  docente?.correo_fallback ??
+  'Sin correo';
 
 const getGruposAsignadosDocente = (docente) =>
-  docente?.grupos_asignados
+  docente?.grupos_asignados_actuales
+  ?? docente?.grupos_asignados
   ?? docente?.grupos_asignados_docente
   ?? docente?.asignaciones_activas
   ?? docente?.total_grupos_asignados
-  ?? docente?.grupos_asignados_actuales
-  ?? docente?.asignaciones_grupo_count
-  ?? docente?.asignaciones_activas_count
-  ?? docente?.grupos_asignados_count
-  ?? docente?.asignaciones?.length
+  ?? docente?.asignacionesGrupo?.filter(a => String(a.estado).toUpperCase() === 'ACTIVA').length
+  ?? docente?.asignaciones_docentes?.filter(a => String(a.estado).toUpperCase() === 'ACTIVA').length
+  ?? docente?.asignaciones?.filter(a => String(a.estado).toUpperCase() === 'ACTIVA').length
   ?? 0;
 
 const getMaxGruposDocente = (docente) =>
@@ -87,7 +96,7 @@ export default function DocenteDetailModal({ docente, onClose }) {
 
         <div className="detail-hero">
           <div>
-            <h4>{fullName(user)}</h4>
+            <h4>{getDocenteNombre(docente)}</h4>
             <span>{getDocenteCorreo(docente)}</span>
           </div>
           <EstadoDocenteBadge estado={docente.estado_docente} />

@@ -11,6 +11,7 @@ import * as examenesService from '../services/examenesCup';
 import * as gruposCupService from '../services/gruposCup';
 import * as materiasService from '../services/materias';
 import * as docentesService from '../services/docentes';
+import * as asignacionDocentesService from '../services/asignacionDocentes';
 import '../styles/examenesCup.css';
 
 const managementRoles = ['admin', 'administrador', 'coordinador', 'docente'];
@@ -36,6 +37,20 @@ const getRole = () => {
 };
 
 const normalizeText = (value) => String(value || '').toLowerCase();
+
+const getDocenteLabel = (docente) => {
+  if (!docente) return 'Docente no asignado';
+  return (
+    docente.nombre ??
+    docente.nombre_usuario ??
+    docente.nombre_completo ??
+    docente.user?.name ??
+    docente.user?.nombre ??
+    docente.correo_usuario ??
+    docente.correo ??
+    `Docente ${docente.id ?? ''}`
+  );
+};
 
 const getPostulanteSearch = (nota) => [
   nota?.postulante?.nombre_completo,
@@ -102,15 +117,67 @@ export default function EvaluacionesNotas() {
   const canImport = importRoles.includes(role);
 
   const loadCatalogs = useCallback(async () => {
-    const [gruposResponse, materiasResponse, docentesResponse] = await Promise.allSettled([
-      gruposCupService.getGruposCup(),
-      materiasService.getMateriasActivas ? materiasService.getMateriasActivas() : materiasService.getMaterias(),
-      docentesService.obtenerDocentesHabilitados ? docentesService.obtenerDocentesHabilitados() : docentesService.listarDocentes(),
-    ]);
+    const userRole = getRole();
+    if (userRole === 'docente') {
+      try {
+        const [profileResponse, assignmentsResponse] = await Promise.all([
+          docentesService.obtenerMiPerfilDocente(),
+          asignacionDocentesService.getMisGruposAsignadosDocente()
+        ]);
+        
+        // Parse profile
+        const profile = profileResponse.data || profileResponse;
+        const currentDocente = profile.docente || profile;
+        const docId = currentDocente?.id;
+        
+        if (currentDocente) {
+          setDocentes([currentDocente]);
+        }
+        
+        // Parse assignments
+        const assignmentsData = assignmentsResponse.data || assignmentsResponse;
+        const list = Array.isArray(assignmentsData) ? assignmentsData : (assignmentsData?.data || []);
+        
+        // Extract unique groups and materias
+        const extractedGroups = [];
+        const extractedMaterias = [];
+        const groupIds = new Set();
+        const materiaIds = new Set();
+        
+        list.forEach(item => {
+          if (item.grupo && !groupIds.has(item.grupo.id)) {
+            groupIds.add(item.grupo.id);
+            extractedGroups.push(item.grupo);
+          }
+          if (item.materia && !materiaIds.has(item.materia.id)) {
+            materiaIds.add(item.materia.id);
+            extractedMaterias.push(item.materia);
+          }
+        });
+        
+        setGrupos(extractedGroups);
+        setMaterias(extractedMaterias);
+        
+        if (docId) {
+          setFilters(prev => ({
+            ...prev,
+            docente_id: String(docId)
+          }));
+        }
+      } catch (err) {
+        console.error('Error loading catalogs for docente:', err);
+      }
+    } else {
+      const [gruposResponse, materiasResponse, docentesResponse] = await Promise.allSettled([
+        gruposCupService.getGruposCup(),
+        materiasService.getMateriasActivas ? materiasService.getMateriasActivas() : materiasService.getMaterias(),
+        docentesService.obtenerDocentesHabilitados ? docentesService.obtenerDocentesHabilitados() : docentesService.listarDocentes(),
+      ]);
 
-    if (gruposResponse.status === 'fulfilled') setGrupos(examenesService.normalizeList(gruposResponse.value));
-    if (materiasResponse.status === 'fulfilled') setMaterias(examenesService.normalizeList(materiasResponse.value));
-    if (docentesResponse.status === 'fulfilled') setDocentes(examenesService.normalizeList(docentesResponse.value));
+      if (gruposResponse.status === 'fulfilled') setGrupos(examenesService.normalizeList(gruposResponse.value));
+      if (materiasResponse.status === 'fulfilled') setMaterias(examenesService.normalizeList(materiasResponse.value));
+      if (docentesResponse.status === 'fulfilled') setDocentes(examenesService.normalizeList(docentesResponse.value));
+    }
   }, []);
 
   const loadData = useCallback(async () => {
@@ -150,13 +217,34 @@ export default function EvaluacionesNotas() {
   }, [loadData]);
 
   const filteredNotas = useMemo(() => {
+    let result = notas;
+    
+    // 1. Filter by search query
     const query = normalizeText(filters.search);
-    if (!query) return notas;
-    return notas.filter((nota) => normalizeText(getPostulanteSearch(nota)).includes(query));
-  }, [notas, filters.search]);
+    if (query) {
+      result = result.filter((nota) => normalizeText(getPostulanteSearch(nota)).includes(query));
+    }
+
+    // 2. Filter by estado_materia
+    const selectedEstado = filters.estado_materia || 'TODOS';
+    if (selectedEstado !== 'TODOS' && selectedEstado !== '') {
+      result = result.filter((nota) => {
+        const estadoRegistro = (nota.estado_materia ?? nota.estado ?? '').toUpperCase();
+        return estadoRegistro === selectedEstado.toUpperCase();
+      });
+    }
+
+    return result;
+  }, [notas, filters.search, filters.estado_materia]);
 
   const clearFilters = () => {
-    setFilters({ search: '', grupo_id: '', materia_id: '', docente_id: '', estado_materia: '' });
+    const userRole = getRole();
+    if (userRole === 'docente') {
+      const docId = docentes.length > 0 ? docentes[0].id : '';
+      setFilters({ search: '', grupo_id: '', materia_id: '', docente_id: docId ? String(docId) : '', estado_materia: '' });
+    } else {
+      setFilters({ search: '', grupo_id: '', materia_id: '', docente_id: '', estado_materia: '' });
+    }
   };
 
   const handleOpenCreate = () => {
@@ -265,18 +353,23 @@ export default function EvaluacionesNotas() {
                   <option key={materia.id} value={materia.id}>{materia.nombre || `Materia ${materia.id}`}</option>
                 ))}
               </select>
-              <select value={filters.docente_id} onChange={(event) => setFilters({ ...filters, docente_id: event.target.value })}>
-                <option value="">Todos los docentes</option>
+              <select 
+                value={filters.docente_id} 
+                onChange={(event) => setFilters({ ...filters, docente_id: event.target.value })}
+                disabled={role === 'docente'}
+              >
+                {role === 'docente' ? null : <option value="">Todos los docentes</option>}
                 {docentes.map((docente) => (
                   <option key={docente.id} value={docente.id}>
-                    {docente.nombre_completo || docente.nombre || docente.user?.name || `Docente ${docente.id}`}
+                    {getDocenteLabel(docente)}
                   </option>
                 ))}
               </select>
               <select value={filters.estado_materia} onChange={(event) => setFilters({ ...filters, estado_materia: event.target.value })}>
-                <option value="">Todos los estados</option>
+                <option value="TODOS">Todos los estados</option>
                 <option value="APROBADO">Aprobado</option>
                 <option value="REPROBADO">Reprobado</option>
+                <option value="PENDIENTE">Pendiente</option>
               </select>
               <button className="btn-ghost btn-inline" type="button" onClick={clearFilters}>
                 <XCircle size={16} /> Limpiar

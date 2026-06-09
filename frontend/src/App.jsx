@@ -22,8 +22,10 @@ import PerfilPostulante from './pages/PerfilPostulante';
 import ConsultarGrupoHorario from './pages/ConsultarGrupoHorario';
 import EvaluacionesNotas from './pages/EvaluacionesNotas';
 import MisNotasCup from './pages/MisNotasCup';
+import AdmisionesCup from './pages/AdmisionesCup';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
+
 
 function RootRedirect() {
   const navigate = useNavigate();
@@ -175,6 +177,14 @@ function App() {
           element={
             <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'docente', 'autoridad']}>
               <EvaluacionesNotas />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admisiones-cup"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <AdmisionesCup />
             </ProtectedRoute>
           }
         />

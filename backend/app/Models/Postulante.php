@@ -73,4 +73,10 @@ class Postulante extends Model
     {
         return $this->hasMany(ExamenCUP::class, 'postulante_id');
     }
+
+    public function admisionCup()
+    {
+        return $this->hasOne(AdmisionCUP::class, 'postulante_id');
+    }
 }
+

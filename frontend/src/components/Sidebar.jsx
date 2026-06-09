@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound, UserCheck, CalendarCheck, Clock } from 'lucide-react';
+import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound, UserCheck, CalendarCheck, Clock, Trophy } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
@@ -11,6 +11,7 @@ export default function Sidebar() {
   const canViewAsignacionesDocentes = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
   const canViewCargaHorariaAulas = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
   const canViewEvaluacionesNotas = ['admin', 'administrador', 'coordinador', 'docente', 'autoridad'].includes(role);
+  const canViewAdmisionesCup = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
 
   return (
     <aside className="app-sidebar">
@@ -68,6 +69,11 @@ export default function Sidebar() {
         {canViewEvaluacionesNotas && (
           <NavLink to="/evaluaciones-notas" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <ClipboardList size={18} /> <span>Evaluaciones y notas</span>
+          </NavLink>
+        )}
+        {canViewAdmisionesCup && (
+          <NavLink to="/admisiones-cup" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <Trophy size={18} /> <span>Admisión por cupos</span>
           </NavLink>
         )}
         {role === 'docente' && (

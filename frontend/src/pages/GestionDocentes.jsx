@@ -9,6 +9,7 @@ import DocenteDetailModal from '../components/DocenteDetailModal';
 import DocenteActionModal from '../components/DocenteActionModal';
 import * as docentesService from '../services/docentes';
 import * as materiasService from '../services/materias';
+import * as asignacionService from '../services/asignacionDocentes';
 import '../styles/docentes.css';
 
 const ESTADOS = [
@@ -122,9 +123,41 @@ export default function GestionDocentes() {
     setError('');
     try {
       const cleanParams = getCleanParams(nextFilters);
-      const response = await docentesService.listarDocentes(cleanParams);
-      const docentesArray = normalizeList(response);
-      setDocentes(filterDocentesLocally(docentesArray, cleanParams));
+      
+      // Load both docentes and assignments to cross-reference groups count and fallback emails
+      const [docentesRes, asignacionesRes] = await Promise.allSettled([
+        docentesService.listarDocentes(cleanParams),
+        asignacionService.getAsignacionesDocentes({ estado: 'ACTIVA' })
+      ]);
+      
+      const docentesArray = docentesRes.status === 'fulfilled' ? normalizeList(docentesRes.value) : [];
+      const asignacionesArray = asignacionesRes.status === 'fulfilled' ? normalizeList(asignacionesRes.value) : [];
+      
+      const filtered = filterDocentesLocally(docentesArray, cleanParams);
+      
+      const mappedDocentes = filtered.map(docente => {
+        const activeAsignaciones = asignacionesArray.filter(a => 
+          (a.docente_id === docente.id || a.docente?.id === docente.id) &&
+          String(a.estado).toUpperCase() === 'ACTIVA'
+        );
+        
+        // Find if any assignment has docente details with correo/email
+        const assignmentWithEmail = activeAsignaciones.find(a => 
+          a.docente?.correo || a.docente?.email || a.docente?.correo_usuario
+        );
+        
+        const fallbackCorreo = assignmentWithEmail 
+          ? (assignmentWithEmail.docente.correo || assignmentWithEmail.docente.email || assignmentWithEmail.docente.correo_usuario)
+          : null;
+          
+        return {
+          ...docente,
+          grupos_asignados_actuales: activeAsignaciones.length,
+          correo_fallback: fallbackCorreo
+        };
+      });
+      
+      setDocentes(mappedDocentes);
     } catch (e) {
       setError(getBackendError(e, 'No se pudieron cargar los docentes.'));
     } finally {
@@ -212,9 +245,12 @@ export default function GestionDocentes() {
   const loadDetail = async (docente) => {
     try {
       const response = await docentesService.obtenerDocente(docente.id);
+      const detailData = extractOne(response);
       setDetail({
         ...docente,
-        ...extractOne(response),
+        ...detailData,
+        grupos_asignados_actuales: docente.grupos_asignados_actuales,
+        correo_fallback: docente.correo_fallback,
       });
     } catch (e) {
       setError(getBackendError(e, 'No se pudo cargar el detalle del docente.'));
