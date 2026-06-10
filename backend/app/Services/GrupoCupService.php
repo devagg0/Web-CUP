@@ -31,54 +31,129 @@ class GrupoCupService
     public function generar(): array
     {
         return DB::transaction(function () {
-            if (GrupoCup::query()->lockForUpdate()->exists()) {
-                throw new RuntimeException('Los grupos ya fueron generados.');
+            $gruposExisten = GrupoCup::query()->lockForUpdate()->exists();
+
+            if (!$gruposExisten) {
+                // Caso A: No existen grupos en el sistema
+                $postulantes = Postulante::query()
+                    ->where('estado_preinscripcion', 'INSCRITO')
+                    ->whereDoesntHave('gruposCup')
+                    ->orderBy('id')
+                    ->lockForUpdate()
+                    ->get();
+
+                $totalInscritos = $postulantes->count();
+
+                if ($totalInscritos === 0) {
+                    throw new RuntimeException('No existen postulantes inscritos para generar grupos.');
+                }
+
+                $cantidadGrupos = $this->calcularCantidadGrupos($totalInscritos);
+                $grupos = collect();
+                $nuevosAsignadosCount = $totalInscritos;
+
+                for ($indice = 1; $indice <= $cantidadGrupos; $indice++) {
+                    $grupoPostulantes = $postulantes
+                        ->slice(($indice - 1) * self::CAPACIDAD_MAXIMA, self::CAPACIDAD_MAXIMA)
+                        ->values();
+
+                    $grupo = GrupoCup::create([
+                        'codigo' => sprintf('CUP-G%02d', $indice),
+                        'nombre' => 'Grupo '.$indice,
+                        'capacidad_maxima' => self::CAPACIDAD_MAXIMA,
+                        'cantidad_estudiantes' => $grupoPostulantes->count(),
+                        'estado' => 'HABILITADO',
+                    ]);
+
+                    $grupo->postulantes()->attach($grupoPostulantes->pluck('id')->all());
+                    $grupos->push($grupo->fresh());
+                }
+
+                $totalInscritosGeneral = $this->totalInscritos();
+                $estudiantesAsignadosGeneral = DB::table('grupo_postulante')->count();
+                $resumen = [
+                    'total_inscritos' => $totalInscritosGeneral,
+                    'capacidad_por_grupo' => self::CAPACIDAD_MAXIMA,
+                    'grupos_generados' => GrupoCup::count(),
+                    'grupos_nuevos_creados' => $cantidadGrupos,
+                    'estudiantes_asignados' => $estudiantesAsignadosGeneral,
+                    'estudiantes_pendientes' => max($totalInscritosGeneral - $estudiantesAsignadosGeneral, 0),
+                    'nuevos_asignados' => $nuevosAsignadosCount,
+                ];
+
+                return [
+                    'message' => 'Grupos generados correctamente',
+                    'resumen' => $resumen,
+                    'grupos' => $grupos,
+                ];
             }
 
-            $postulantes = Postulante::query()
+            // Caso B: Ya existen grupos en el sistema. Asignar pendientes en grupos nuevos.
+            $postulantesPendientes = Postulante::query()
                 ->where('estado_preinscripcion', 'INSCRITO')
                 ->whereDoesntHave('gruposCup')
                 ->orderBy('id')
                 ->lockForUpdate()
                 ->get();
 
-            $totalInscritos = $postulantes->count();
-
-            if ($totalInscritos === 0) {
-                throw new RuntimeException('No existen postulantes inscritos para generar grupos.');
+            if ($postulantesPendientes->isEmpty()) {
+                throw new RuntimeException('Los grupos ya fueron generados y no hay postulantes pendientes por asignar.');
             }
 
-            $cantidadGrupos = $this->calcularCantidadGrupos($totalInscritos);
-            $grupos = collect();
+            // Determine next sequential group index
+            $maxGrupo = GrupoCup::query()
+                ->where('codigo', 'like', 'CUP-G%')
+                ->orderByDesc('codigo')
+                ->first();
+            
+            $siguienteIndice = 1;
+            if ($maxGrupo) {
+                if (preg_match('/CUP-G(\d+)/', $maxGrupo->codigo, $matches)) {
+                    $siguienteIndice = ((int)$matches[1]) + 1;
+                }
+            } else {
+                $siguienteIndice = GrupoCup::count() + 1;
+            }
 
-            for ($indice = 1; $indice <= $cantidadGrupos; $indice++) {
-                $grupoPostulantes = $postulantes
-                    ->slice(($indice - 1) * self::CAPACIDAD_MAXIMA, self::CAPACIDAD_MAXIMA)
+            $cantidadNuevosGrupos = (int) ceil($postulantesPendientes->count() / self::CAPACIDAD_MAXIMA);
+            $gruposCreados = collect();
+            $nuevosAsignadosCount = $postulantesPendientes->count();
+
+            for ($i = 0; $i < $cantidadNuevosGrupos; $i++) {
+                $grupoPostulantes = $postulantesPendientes
+                    ->slice($i * self::CAPACIDAD_MAXIMA, self::CAPACIDAD_MAXIMA)
                     ->values();
 
                 $grupo = GrupoCup::create([
-                    'codigo' => sprintf('CUP-G%02d', $indice),
-                    'nombre' => 'Grupo '.$indice,
+                    'codigo' => sprintf('CUP-G%02d', $siguienteIndice),
+                    'nombre' => 'Grupo '.$siguienteIndice,
                     'capacidad_maxima' => self::CAPACIDAD_MAXIMA,
                     'cantidad_estudiantes' => $grupoPostulantes->count(),
                     'estado' => 'HABILITADO',
                 ]);
 
                 $grupo->postulantes()->attach($grupoPostulantes->pluck('id')->all());
-                $grupos->push($grupo->fresh());
+                $gruposCreados->push($grupo->fresh());
+
+                $siguienteIndice++;
             }
 
+            $totalInscritosGeneral = $this->totalInscritos();
+            $estudiantesAsignadosGeneral = DB::table('grupo_postulante')->count();
             $resumen = [
-                'total_inscritos' => $totalInscritos,
+                'total_inscritos' => $totalInscritosGeneral,
                 'capacidad_por_grupo' => self::CAPACIDAD_MAXIMA,
-                'grupos_generados' => $grupos->count(),
-                'estudiantes_asignados' => $totalInscritos,
-                'estudiantes_pendientes' => 0,
+                'grupos_generados' => GrupoCup::count(),
+                'grupos_nuevos_creados' => $cantidadNuevosGrupos,
+                'estudiantes_asignados' => $estudiantesAsignadosGeneral,
+                'estudiantes_pendientes' => max($totalInscritosGeneral - $estudiantesAsignadosGeneral, 0),
+                'nuevos_asignados' => $nuevosAsignadosCount,
             ];
 
             return [
+                'message' => 'Se crearon nuevos grupos para los postulantes pendientes.',
                 'resumen' => $resumen,
-                'grupos' => $grupos,
+                'grupos' => $gruposCreados,
             ];
         });
     }

@@ -55,7 +55,7 @@ export default function PagoPreinscripcionDetailModal({
   const comprobanteUrl = getComprobanteUrl(record);
   const pago = record.pago || record.pago_preinscripcion || {};
   const observacionPago = pago.observacion || record.observacion_pago || record.observacion || '—';
-  const canReviewPayment = estado === 'PAGO_EN_REVISION' && Boolean(comprobanteUrl);
+  const canReviewPayment = estado === 'PAGO_EN_REVISION' && (Boolean(comprobanteUrl) || pago.metodo_pago === 'STRIPE');
 
   const handleObserve = async () => {
     if (!observacion.trim()) return;
@@ -88,24 +88,37 @@ export default function PagoPreinscripcionDetailModal({
           </div>
           <div className="detail-item">
             <strong>Datos del pago</strong>
-            <p><strong>Estado:</strong> <EstadoPreinscripcionBadge estado={estado} /></p>
-            <p><strong>Fecha:</strong> {pago.created_at || pago.fecha || record.updated_at || record.created_at || record.fecha || '—'}</p>
-            <p><strong>Monto:</strong> {pago.monto || pago.importe || record.monto_pago || '—'}</p>
-            <p>
-              <strong>Comprobante:</strong>{' '}
-              {comprobanteUrl ? (
-                <a href={comprobanteUrl} target="_blank" rel="noopener noreferrer">Ver comprobante</a>
-              ) : (
-                'Comprobante pendiente.'
-              )}
-            </p>
+            {pago.metodo_pago === 'STRIPE' ? (
+              <>
+                <p><strong>Método:</strong> Stripe modo prueba</p>
+                <p><strong>Stripe Session ID:</strong> <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{pago.stripe_session_id || '—'}</span></p>
+                <p><strong>Stripe Payment Intent:</strong> <span style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{pago.stripe_payment_intent_id || '—'}</span></p>
+                <p><strong>Fecha de pago:</strong> {pago.fecha_pago || pago.created_at || '—'}</p>
+                <p><strong>Monto:</strong> {pago.monto || '—'} USD</p>
+                <p><strong>Estado de validación:</strong> <EstadoPreinscripcionBadge estado={estado} /></p>
+              </>
+            ) : (
+              <>
+                <p><strong>Estado:</strong> <EstadoPreinscripcionBadge estado={estado} /></p>
+                <p><strong>Fecha:</strong> {pago.created_at || pago.fecha || record.updated_at || record.created_at || record.fecha || '—'}</p>
+                <p><strong>Monto:</strong> {pago.monto || pago.importe || record.monto_pago || '—'}</p>
+                <p>
+                  <strong>Comprobante:</strong>{' '}
+                  {comprobanteUrl ? (
+                    <a href={comprobanteUrl} target="_blank" rel="noopener noreferrer">Ver comprobante</a>
+                  ) : (
+                    'Comprobante pendiente.'
+                  )}
+                </p>
+              </>
+            )}
           </div>
         </div>
 
         {estado === 'PAGO_HABILITADO' && (
           <div className="observation-panel">
             <strong>Pago habilitado</strong>
-            <p>Esperando comprobante del postulante.</p>
+            <p>Esperando pago del postulante.</p>
           </div>
         )}
 
@@ -123,7 +136,7 @@ export default function PagoPreinscripcionDetailModal({
           </div>
         )}
 
-        {estado === 'PAGO_EN_REVISION' && !comprobanteUrl && (
+        {estado === 'PAGO_EN_REVISION' && !comprobanteUrl && pago.metodo_pago !== 'STRIPE' && (
           <div className="observation-panel">
             <strong>Comprobante pendiente.</strong>
             <p>No se puede aprobar el pago hasta que exista un comprobante.</p>

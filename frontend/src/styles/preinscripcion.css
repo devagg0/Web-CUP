@@ -669,6 +669,132 @@
   }
 }
 
+/* Stripe payment styles */
+.stripe-payment-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 32px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 20px;
+  margin-top: 16px;
+  gap: 16px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.stripe-payment-container p {
+  font-size: 1.05rem;
+  color: #475569;
+  line-height: 1.6;
+  max-width: 480px;
+  margin: 0;
+}
+
+.stripe-details-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.stripe-details-card .detail-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.95rem;
+  color: #475569;
+  border-bottom: 1px dashed #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.stripe-details-card .detail-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stripe-logo-img {
+  height: 24px;
+}
+
+.btn-stripe-pay {
+  background: linear-gradient(135deg, #635bff 0%, #4f46e5 100%);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: 16px;
+  padding: 16px 32px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+  box-shadow: 0 10px 15px -3px rgba(99, 91, 255, 0.3), 0 4px 6px -4px rgba(99, 91, 255, 0.3);
+}
+
+.btn-stripe-pay:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(99, 91, 255, 0.4), 0 8px 10px -6px rgba(99, 91, 255, 0.4);
+  filter: brightness(1.05);
+}
+
+.btn-stripe-pay:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-stripe-pay:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success page elements */
+.success-logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.success-badge-icon {
+  width: 72px;
+  height: 72px;
+  background: #dcfce7;
+  color: #15803d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 10px 15px -3px rgba(22, 101, 52, 0.2);
+}
+
+/* Printable voucher styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printable-voucher, .printable-voucher * {
+    visibility: visible;
+  }
+  .printable-voucher {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+
 @media (max-width: 640px) {
   .public-header-card {
     padding: 24px;

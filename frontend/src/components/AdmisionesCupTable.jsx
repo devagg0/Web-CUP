@@ -7,7 +7,15 @@ const text = (value) => value || 'No registrado';
 const getCarreraNombre = (carrera) => {
   if (!carrera) return 'Sin carrera';
   if (typeof carrera === 'string') return carrera;
-  if (typeof carrera === 'object') return carrera.nombre ?? carrera.descripcion ?? `Carrera ${carrera.id ?? ''}`;
+  if (typeof carrera === 'object') {
+    return (
+      carrera.nombre ??
+      carrera.descripcion ??
+      carrera.carrera ??
+      carrera.nombre_carrera ??
+      `Carrera ${carrera.id ?? ''}`
+    );
+  }
   return String(carrera);
 };
 
@@ -15,7 +23,7 @@ export default function AdmisionesCupTable({ admisiones = [], onView }) {
   const safeAdmisiones = Array.isArray(admisiones) ? admisiones : [];
 
   if (!safeAdmisiones.length) {
-    return <div className="empty-state">No hay resultados de admisión para mostrar con los filtros seleccionados.</div>;
+    return <div className="empty-state">No se encontraron resultados con los filtros aplicados.</div>;
   }
 
   const getPostulanteNombre = (item) =>
@@ -26,10 +34,10 @@ export default function AdmisionesCupTable({ admisiones = [], onView }) {
 
   const getCi = (item) => item?.postulante?.ci || item?.postulante_ci || item?.ci || 'Sin CI';
   
-  const getPromedio = (item) =>
-    item?.promedio !== undefined && item?.promedio !== null
-      ? Number(item.promedio).toFixed(2)
-      : '-';
+  const getPromedio = (item) => {
+    const val = item?.promedio_final_cup ?? item?.promedio;
+    return val !== undefined && val !== null ? Number(val).toFixed(2) : '-';
+  };
 
   return (
     <div className="notas-table-wrapper admisiones-table-wrapper">
@@ -40,26 +48,22 @@ export default function AdmisionesCupTable({ admisiones = [], onView }) {
             <th>Postulante</th>
             <th>CI</th>
             <th>Promedio CUP</th>
-            <th>Estado académico</th>
-            <th>1ra Carrera</th>
-            <th>2da Carrera</th>
-            <th>Carrera Asignada</th>
-            <th>Estado Admisión</th>
-            <th>Tipo Admisión</th>
+            <th>1ra opción</th>
+            <th>2da opción</th>
+            <th>Carrera asignada</th>
+            <th>Estado admisión</th>
             <th style={{ textAlign: 'center' }}>Acciones</th>
           </tr>
         </thead>
         <tbody>
           {safeAdmisiones.map((item, index) => {
             if (!item) return null;
-            const ranking = item?.posicion_ranking || item?.ranking || '-';
-            const estadoAcademico = item?.estado_academico || 'PENDIENTE';
+            const ranking = item?.posicion_ranking ?? item?.ranking ?? '-';
             const primeraCarrera = getCarreraNombre(item?.primera_carrera || item?.primera_carrera_nombre);
             const segundaCarrera = getCarreraNombre(item?.segunda_carrera || item?.segunda_carrera_nombre);
             const carreraAsignadaRaw = item?.carrera_asignada || item?.carrera_asignada_nombre;
             const carreraAsignada = carreraAsignadaRaw ? getCarreraNombre(carreraAsignadaRaw) : null;
             const estadoAdmision = item?.estado_admision || item?.estado || 'PENDIENTE';
-            const tipoAdmision = item?.tipo_admision || 'Regular';
 
             return (
               <tr key={item?.id || `${getCi(item)}-${index}`}>
@@ -75,22 +79,16 @@ export default function AdmisionesCupTable({ admisiones = [], onView }) {
                 <td>
                   <strong className="promedio-cell">{getPromedio(item)}</strong>
                 </td>
-                <td>
-                  <span className={`estado-academico-label ${estadoAcademico.toLowerCase()}`}>
-                    {estadoAcademico}
-                  </span>
-                </td>
                 <td>{text(primeraCarrera)}</td>
                 <td>{text(segundaCarrera)}</td>
                 <td>
-                  <strong className={carreraAsignada ? 'text-primary-color' : 'text-muted'}>
-                    {carreraAsignada || 'Sin carrera asignada'}
+                  <strong className={carreraAsignada && carreraAsignada !== 'Sin carrera' ? 'text-primary-color' : 'text-muted'}>
+                    {carreraAsignada && carreraAsignada !== 'Sin carrera' ? carreraAsignada : 'Sin carrera asignada'}
                   </strong>
                 </td>
                 <td>
                   <EstadoAdmisionBadge estado={estadoAdmision} />
                 </td>
-                <td>{text(tipoAdmision)}</td>
                 <td>
                   <div className="row-actions" style={{ justifyContent: 'center' }}>
                     <button

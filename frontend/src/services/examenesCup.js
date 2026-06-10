@@ -49,6 +49,11 @@ export async function getExamenesCup(params = {}) {
   return response.data;
 }
 
+export async function getPostulantesDisponibles(params = {}) {
+  const response = await api.get('/admin/examenes-cup/postulantes-disponibles', { params });
+  return response.data;
+}
+
 export async function getNotasPostulanteAdmin(postulanteId) {
   const response = await api.get(`/admin/examenes-cup/${postulanteId}`);
   return response.data;
@@ -81,6 +86,7 @@ export async function getMisNotasCup() {
 export default {
   getResumenExamenesCup,
   getExamenesCup,
+  getPostulantesDisponibles,
   getNotasPostulanteAdmin,
   registrarNotaCup,
   actualizarNotaCup,

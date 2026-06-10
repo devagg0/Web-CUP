@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
-import FileUploadBox from './FileUploadBox';
-import QRPaymentBox from './QRPaymentBox';
+import * as preinscripcionService from '../services/preinscripcion';
 
 const estadoLabels = {
   EN_REVISION_REQUISITOS: 'En revisión de requisitos',
@@ -30,6 +29,8 @@ export default function ConsultaPreinscripcionPanel({
   const [correo, setCorreo] = useState('');
   const [comprobante, setComprobante] = useState(null);
   const [formErrors, setFormErrors] = useState({});
+  const [stripeLoading, setStripeLoading] = useState(false);
+  const [stripeError, setStripeError] = useState('');
 
   const estado = useMemo(() => String(result?.estado_preinscripcion || result?.estado || result?.status || '').toUpperCase(), [result]);
 
@@ -45,6 +46,28 @@ export default function ConsultaPreinscripcionPanel({
     event.preventDefault();
     if (!validateSearch()) return;
     onSearch({ ci: ci.trim(), correo: correo.trim() });
+  };
+
+  const handleStripePayment = async () => {
+    setStripeLoading(true);
+    setStripeError('');
+    try {
+      const response = await preinscripcionService.iniciarPagoStripe(ci.trim(), correo.trim());
+      if (response.data && response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      } else {
+        setStripeError('No se recibió la URL de pago de Stripe.');
+      }
+    } catch (err) {
+      console.error('Error al iniciar pago Stripe:', err);
+      if (err.response?.data?.message) {
+        setStripeError(err.response.data.message);
+      } else {
+        setStripeError('Error al iniciar el pago con Stripe. Intente nuevamente.');
+      }
+    } finally {
+      setStripeLoading(false);
+    }
   };
 
   const handleUploadSubmit = async (event) => {
@@ -131,48 +154,67 @@ export default function ConsultaPreinscripcionPanel({
             </div>
           )}
 
-          {estado === 'PAGO_HABILITADO' && (
+          {(estado === 'PAGO_HABILITADO' || estado === 'PAGO_OBSERVADO') && (
             <div className="payment-section">
-              <div className="status-card info-card">
-                <p><strong>Pago habilitado</strong></p>
-                <p>Tus requisitos fueron aprobados. Ya puedes realizar el pago para completar tu inscripción.</p>
+              <div className={`status-card ${estado === 'PAGO_OBSERVADO' ? 'warning-card' : 'info-card'}`}>
+                {estado === 'PAGO_OBSERVADO' ? (
+                  <>
+                    <p><strong>Pago observado</strong></p>
+                    <p>Tu pago previo fue observado por administración.</p>
+                    {(result.observacion || result.observacion_admin) && <p><strong>Observación:</strong> {result.observacion || result.observacion_admin}</p>}
+                    <p>Puedes proceder a realizar el pago oficial mediante Stripe para que administración vuelva a verificar tu inscripción.</p>
+                  </>
+                ) : (
+                  <>
+                    <p><strong>Pago habilitado</strong></p>
+                    <p>Tus requisitos fueron aprobados. Ya puedes realizar el pago para completar tu inscripción.</p>
+                  </>
+                )}
               </div>
-              <QRPaymentBox />
-              <form className="consulta-form" onSubmit={handleUploadSubmit}>
-                <div className="field-grid single">
-                  <FileUploadBox
-                    label="Comprobante de pago"
-                    file={comprobante}
-                    onChange={(file) => {
-                      setComprobante(file);
-                      setFormErrors((prev) => ({ ...prev, comprobante: '' }));
-                    }}
-                    error={formErrors.comprobante || uploadError}
-                    required
-                  />
+
+              <div className="stripe-payment-container">
+                <p>Para su comodidad y seguridad, el pago se procesa a través de la pasarela de pagos internacional <strong>Stripe</strong>.</p>
+                
+                <div className="stripe-details-card">
+                  <div className="detail-row">
+                    <span className="detail-label">Concepto:</span>
+                    <span className="detail-value">Derecho de Inscripción CUP</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Monto:</span>
+                    <span className="detail-value">100.00 USD</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-label">Método de pago:</span>
+                    <span className="detail-value">Tarjetas Débito / Crédito</span>
+                  </div>
                 </div>
-                <div className="button-row">
-                  <button type="submit" className="btn-primary" disabled={uploadLoading}>
-                    {uploadLoading ? 'Enviando comprobante...' : 'Enviar comprobante'}
-                  </button>
-                </div>
-                {uploadSuccess && <div className="form-message success-card"><strong>✓ Éxito</strong><p>{uploadSuccess}</p></div>}
-              </form>
+
+                <button
+                  type="button"
+                  className="btn-stripe-pay"
+                  onClick={handleStripePayment}
+                  disabled={stripeLoading}
+                >
+                  {stripeLoading ? (
+                    <>Cargando pasarela...</>
+                  ) : (
+                    <>
+                      <span>Pagar inscripción con Stripe</span>
+                    </>
+                  )}
+                </button>
+                {stripeError && <div className="form-error">{stripeError}</div>}
+              </div>
             </div>
           )}
 
           {estado === 'PAGO_EN_REVISION' && (
             <div className="status-card info-card">
-              <p>Tu comprobante está en revisión.</p>
+              <p>Tu comprobante/pago está en revisión.</p>
             </div>
           )}
 
-          {estado === 'PAGO_OBSERVADO' && (
-            <div className="status-card warning-card">
-              <p>Tu comprobante fue observado por administración.</p>
-              {(result.observacion || result.observacion_admin) && <p><strong>Observación:</strong> {result.observacion || result.observacion_admin}</p>}
-            </div>
-          )}
 
           {estado === 'INSCRITO' && (
             <div className="status-card success-status-card">

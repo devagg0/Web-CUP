@@ -20,6 +20,22 @@ class ExamenCUPController extends Controller
         return response()->json($this->examenService->resumen($request->user()));
     }
 
+    public function postulantesDisponibles(Request $request)
+    {
+        $search = $request->query('search');
+        $grupoId = $request->query('grupo_id') ? (int) $request->query('grupo_id') : null;
+        $materiaId = $request->query('materia_id') ? (int) $request->query('materia_id') : null;
+
+        $postulantes = $this->examenService->postulantesDisponibles(
+            $request->user(),
+            $search,
+            $grupoId,
+            $materiaId
+        );
+
+        return response()->json($postulantes);
+    }
+
     public function index(Request $request)
     {
         $query = $this->examenService->queryVisibleParaUsuario($request->user());

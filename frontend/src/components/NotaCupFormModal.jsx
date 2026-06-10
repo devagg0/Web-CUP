@@ -79,8 +79,6 @@ export default function NotaCupFormModal({
   const [localError, setLocalError] = useState('');
   
   const [userRole, setUserRole] = useState('');
-  const [allInscritos, setAllInscritos] = useState([]);
-  const [groupStudents, setGroupStudents] = useState([]);
   const [filteredPostulantes, setFilteredPostulantes] = useState([]);
   const [selectedPostulante, setSelectedPostulante] = useState(null);
   const [searchText, setSearchText] = useState('');
@@ -139,23 +137,10 @@ export default function NotaCupFormModal({
         setSearchText('');
       }
       setLocalError('');
-      setGroupStudents([]);
       setFilteredPostulantes([]);
       setShowDropdown(false);
 
-      // 3. Load preinscripciones list
-      const fetchPreinscripciones = async () => {
-        try {
-          const res = await preinscripcionService.getAdminPreinscripciones();
-          const list = examenesService.normalizeList(res);
-          const inscritos = list.filter(p => String(p.estado_preinscripcion || p.estado || '').toUpperCase() === 'INSCRITO');
-          setAllInscritos(inscritos);
-        } catch (err) {
-          console.error('Error loading preinscripciones inside modal:', err);
-        }
-      };
-
-      // 4. Load catalogs and settings depending on role
+      // 3. Load catalogs and settings depending on role
       const setupRoleData = async (roleVal) => {
         if (roleVal === 'docente') {
           try {
@@ -214,40 +199,18 @@ export default function NotaCupFormModal({
         }
       };
 
-      fetchPreinscripciones();
       setupRoleData(role);
     }
   }, [open, isEdit, nota, grupos, materias, docentes]);
 
-  // Hook to watch group selection and load group students
+  // Hook to watch group selection and clear search / selection
   useEffect(() => {
     if (!open || isEdit) return;
 
-    const groupId = form.grupo_id;
-    if (!groupId) {
-      setGroupStudents([]);
-      setFilteredPostulantes([]);
-      setSelectedPostulante(null);
-      setForm(prev => ({ ...prev, postulante_id: '' }));
-      return;
-    }
-
-    const fetchGroupStudents = async () => {
-      try {
-        const res = await gruposCupService.getGrupoCup(groupId);
-        const groupData = res.data || res;
-        setGroupStudents(groupData.estudiantes || []);
-      } catch (err) {
-        console.error('Error fetching group students:', err);
-        setGroupStudents([]);
-      }
-    };
-
-    fetchGroupStudents();
-    
     setSelectedPostulante(null);
     setForm(prev => ({ ...prev, postulante_id: '' }));
     setSearchText('');
+    setFilteredPostulantes([]);
   }, [form.grupo_id, open, isEdit]);
 
   // Hook to dynamically fetch active docentes for Admin/Coordinador
@@ -296,7 +259,7 @@ export default function NotaCupFormModal({
     setForm((current) => ({ ...current, [name]: value }));
   };
 
-  const handleSearchChange = (event) => {
+  const handleSearchChange = async (event) => {
     const value = event.target.value;
     setSearchText(value);
     
@@ -306,25 +269,25 @@ export default function NotaCupFormModal({
       return;
     }
 
-    const query = value.toLowerCase().trim();
+    if (!form.grupo_id) {
+      setFilteredPostulantes([]);
+      setShowDropdown(false);
+      return;
+    }
 
-    const studentsInSelectedGroup = allInscritos.filter(p => 
-      groupStudents.some(gs => String(gs.ci) === String(p.ci))
-    );
-
-    const filtered = studentsInSelectedGroup.filter(p => {
-      const ciVal = String(p.ci || '').toLowerCase();
-      const nombresVal = String(p.nombres || '').toLowerCase();
-      const apellidosVal = String(p.apellidos || '').toLowerCase();
-      const fullnameVal = String(p.nombre_completo || '').toLowerCase();
-      const correoVal = String(p.correo || '').toLowerCase();
-      const searchFields = [ciVal, nombresVal, apellidosVal, fullnameVal, correoVal];
-      
-      return searchFields.some(field => field.includes(query));
-    });
-
-    setFilteredPostulantes(filtered);
-    setShowDropdown(true);
+    try {
+      const res = await examenesService.getPostulantesDisponibles({
+        search: value,
+        grupo_id: form.grupo_id,
+        materia_id: form.materia_id || undefined,
+      });
+      const list = examenesService.normalizeList(res);
+      setFilteredPostulantes(list);
+      setShowDropdown(true);
+    } catch (err) {
+      console.error('Error fetching dynamic search results:', err);
+      setFilteredPostulantes([]);
+    }
   };
 
   const handleSelectPostulante = (student) => {
@@ -428,10 +391,14 @@ export default function NotaCupFormModal({
                 <div className="search-input-wrapper">
                   <input
                     type="text"
-                    placeholder={form.grupo_id ? "Buscar por CI, nombre o correo" : "Selecciona un grupo primero"}
+                    placeholder={form.grupo_id ? "Buscar por CI, nombre o correo" : "Selecciona un grupo para buscar postulantes."}
                     value={searchText}
                     onChange={handleSearchChange}
-                    onFocus={() => setShowDropdown(true)}
+                    onFocus={() => {
+                      if (form.grupo_id && searchText) {
+                        setShowDropdown(true);
+                      }
+                    }}
                     onBlur={() => {
                       setTimeout(() => setShowDropdown(false), 200);
                     }}
@@ -443,6 +410,12 @@ export default function NotaCupFormModal({
                     </button>
                   )}
                 </div>
+
+                {!form.grupo_id && (
+                  <p className="search-help-text" style={{ color: '#c2410c', marginTop: '4px', fontSize: '0.875rem' }}>
+                    Selecciona un grupo para buscar postulantes.
+                  </p>
+                )}
 
                 {showDropdown && searchText && (
                   <div className="search-results-dropdown">
@@ -456,12 +429,12 @@ export default function NotaCupFormModal({
                             handleSelectPostulante(student);
                           }}
                         >
-                          {student.ci} - {student.nombre_completo || `${student.nombres} ${student.apellidos}`}
+                          {student.nombre_completo || `${student.nombres} ${student.apellidos}`} (CI: {student.ci} - {student.correo})
                         </div>
                       ))
                     ) : (
                       <div className="search-no-results">
-                        No se encontraron resultados
+                        No se encontraron postulantes inscritos para este grupo.
                       </div>
                     )}
                   </div>
@@ -471,11 +444,13 @@ export default function NotaCupFormModal({
               {selectedPostulante && (
                 <div className="selected-student-card" style={{ gridColumn: 'span 2' }}>
                   <div className="selected-student-info">
-                    <div className="student-name">{selectedPostulante.nombre_completo}</div>
-                    <div className="student-meta">CI: {selectedPostulante.ci} | Correo: {selectedPostulante.correo}</div>
+                    <div className="student-name">{selectedPostulante.nombre_completo || `${selectedPostulante.nombres} ${selectedPostulante.apellidos}`}</div>
+                    <div className="student-meta">
+                      CI: {selectedPostulante.ci} | Correo: {selectedPostulante.correo} | Grupo: {selectedPostulante.grupo?.codigo || selectedPostulante.grupo?.nombre || 'Ninguno'}
+                    </div>
                   </div>
                   <div className="selected-student-actions">
-                    <span className="badge-inscrito">INSCRITO</span>
+                    <span className="badge-inscrito">{selectedPostulante.estado || selectedPostulante.estado_preinscripcion || 'INSCRITO'}</span>
                     <button
                       className="btn-remove-selection"
                       type="button"

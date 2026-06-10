@@ -15,6 +15,7 @@ import MiCargaHorariaDocente from './pages/MiCargaHorariaDocente';
 import MisAsistenciasDocente from './pages/MisAsistenciasDocente';
 import Preinscripcion from './pages/Preinscripcion';
 import ConsultaPreinscripcion from './pages/ConsultaPreinscripcion';
+import PagoExitosoStripe from './pages/PagoExitosoStripe';
 import AdminPreinscripciones from './pages/AdminPreinscripciones';
 import AdminPagosPreinscripcion from './pages/AdminPagosPreinscripcion';
 import CambiarPassword from './pages/CambiarPassword';
@@ -23,6 +24,9 @@ import ConsultarGrupoHorario from './pages/ConsultarGrupoHorario';
 import EvaluacionesNotas from './pages/EvaluacionesNotas';
 import MisNotasCup from './pages/MisNotasCup';
 import AdmisionesCup from './pages/AdmisionesCup';
+import ResultadoAdmisionPostulante from './pages/ResultadoAdmisionPostulante';
+import ReportesAcademicos from './pages/ReportesAcademicos';
+import DashboardAdminCup from './pages/DashboardAdminCup';
 import ProtectedRoute from './components/ProtectedRoute';
 import { validateToken } from './services/auth';
 
@@ -109,6 +113,14 @@ function App() {
           }
         />
         <Route
+          path="/postulante/resultado-admision"
+          element={
+            <ProtectedRoute requiredRole="postulante">
+              <ResultadoAdmisionPostulante />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
@@ -189,6 +201,22 @@ function App() {
           }
         />
         <Route
+          path="/reportes-academicos"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <ReportesAcademicos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard-admin"
+          element={
+            <ProtectedRoute requiredRole={['admin', 'administrador', 'coordinador', 'autoridad']}>
+              <DashboardAdminCup />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/docente/mi-perfil"
           element={
             <ProtectedRoute requiredRole="docente">
@@ -222,6 +250,7 @@ function App() {
         />
         <Route path="/preinscripcion" element={<Preinscripcion />} />
         <Route path="/consultar-preinscripcion" element={<ConsultaPreinscripcion />} />
+        <Route path="/postulante/pago-exitoso" element={<PagoExitosoStripe />} />
         <Route
           path="/admin/preinscripciones"
           element={

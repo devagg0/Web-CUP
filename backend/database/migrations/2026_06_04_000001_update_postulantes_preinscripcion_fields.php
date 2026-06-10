@@ -10,9 +10,16 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('postulantes')) {
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN user_id DROP NOT NULL");
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN segunda_carrera_id DROP NOT NULL");
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN estado_preinscripcion SET DEFAULT 'EN_REVISION'");
+            if (DB::getDriverName() !== 'sqlite') {
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN user_id DROP NOT NULL");
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN segunda_carrera_id DROP NOT NULL");
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN estado_preinscripcion SET DEFAULT 'EN_REVISION'");
+            } else {
+                Schema::table('postulantes', function (Blueprint $table) {
+                    $table->foreignId('user_id')->nullable()->change();
+                    $table->foreignId('segunda_carrera_id')->nullable()->change();
+                });
+            }
 
             Schema::table('postulantes', function (Blueprint $table) {
                 if (! Schema::hasColumn('postulantes', 'observacion_admin')) {
@@ -39,9 +46,16 @@ return new class extends Migration
                 }
             });
 
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN user_id SET NOT NULL");
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN segunda_carrera_id SET NOT NULL");
-            DB::statement("ALTER TABLE postulantes ALTER COLUMN estado_preinscripcion SET DEFAULT 'PREINSCRITO'");
+            if (DB::getDriverName() !== 'sqlite') {
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN user_id SET NOT NULL");
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN segunda_carrera_id SET NOT NULL");
+                DB::statement("ALTER TABLE postulantes ALTER COLUMN estado_preinscripcion SET DEFAULT 'PREINSCRITO'");
+            } else {
+                Schema::table('postulantes', function (Blueprint $table) {
+                    $table->foreignId('user_id')->change();
+                    $table->foreignId('segunda_carrera_id')->change();
+                });
+            }
         }
     }
 };

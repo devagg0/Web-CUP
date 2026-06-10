@@ -40,9 +40,14 @@ class ExamenCUP extends Model
         return round(($parcial1 * 0.30) + ($parcial2 * 0.30) + ($parcial3 * 0.40), 2);
     }
 
-    public static function estadoMateria(float $notaFinal): string
+    public static function estadoMateria(float $parcial1, float $parcial2, float $parcial3, float $notaFinal): string
     {
-        return $notaFinal >= 60 ? self::ESTADO_APROBADO : self::ESTADO_REPROBADO;
+        return (
+            $parcial1 >= 60 &&
+            $parcial2 >= 60 &&
+            $parcial3 >= 60 &&
+            $notaFinal >= 60
+        ) ? self::ESTADO_APROBADO : self::ESTADO_REPROBADO;
     }
 
     public function postulante()

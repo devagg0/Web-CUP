@@ -73,7 +73,13 @@ class GrupoCupController extends Controller
         }
 
         return response()->json([
-            'message' => 'Grupos generados correctamente',
+            'message' => $resultado['message'] ?? 'Grupos generados correctamente',
+            'total_inscritos' => $resultado['resumen']['total_inscritos'] ?? 0,
+            'estudiantes_asignados' => $resultado['resumen']['estudiantes_asignados'] ?? 0,
+            'estudiantes_pendientes' => $resultado['resumen']['estudiantes_pendientes'] ?? 0,
+            'grupos_generados' => $resultado['resumen']['grupos_generados'] ?? 0,
+            'grupos_nuevos_creados' => $resultado['resumen']['grupos_nuevos_creados'] ?? 0,
+            'nuevos_asignados' => $resultado['resumen']['nuevos_asignados'] ?? 0,
             'resumen' => $resultado['resumen'],
             'grupos' => $resultado['grupos']->map(fn (GrupoCup $grupo) => [
                 'id' => $grupo->id,

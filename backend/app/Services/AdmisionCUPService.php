@@ -28,8 +28,17 @@ class AdmisionCUPService
         // Calcula el promedio de las materias calificadas
         $promedio = round($examenes->avg('nota_final'), 2);
 
-        // Verifica si aprobó todas las materias
-        $todasAprobadas = $examenes->every(fn ($examen) => $examen->estado_materia === 'APROBADO');
+        // Verifica si aprobó todas las materias normalizando a mayúsculas, quitando espacios y tildes
+        $todasAprobadas = $examenes->every(function ($examen) {
+            $estado = trim($examen->estado_materia);
+            // Reemplazar tildes comunes
+            $estado = str_replace(
+                ['á', 'é', 'í', 'ó', 'ú', 'Á', 'É', 'Í', 'Ó', 'Ú'],
+                ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'],
+                $estado
+            );
+            return strtoupper($estado) === 'APROBADO';
+        });
 
         return [
             'promedio_final_cup' => $promedio,
@@ -44,7 +53,7 @@ class AdmisionCUPService
     {
         return DB::transaction(function () {
             // 1. Validar que existan postulantes inscritos
-            $postulantes = Postulante::where('estado_preinscripcion', 'INSCRITO')
+            $postulantes = Postulante::where(DB::raw('upper(trim(estado_preinscripcion))'), 'INSCRITO')
                 ->with(['examenesCup', 'primeraCarrera', 'segundaCarrera'])
                 ->get();
 
@@ -291,6 +300,15 @@ class AdmisionCUPService
                 ->orWhere('apellidos', 'like', '%' . $nombre . '%'));
         }
 
+        if ($request->filled('search')) {
+            $search = trim($request->input('search'));
+            $query->whereHas('postulante', function ($q) use ($search) {
+                $q->where('ci', 'like', '%' . $search . '%')
+                  ->orWhere('nombres', 'like', '%' . $search . '%')
+                  ->orWhere('apellidos', 'like', '%' . $search . '%');
+            });
+        }
+
         if ($request->filled('primera_carrera_id')) {
             $query->where('primera_carrera_id', $request->input('primera_carrera_id'));
         }
@@ -303,13 +321,15 @@ class AdmisionCUPService
             $query->where('carrera_asignada_id', $request->input('carrera_asignada_id'));
         }
 
-        $ordenPromedio = $request->input('orden_promedio', 'desc');
+        $ordenPromedio = $request->input('orden_promedio', $request->input('sort_promedio', 'desc'));
         if (!in_array($ordenPromedio, ['asc', 'desc'])) {
             $ordenPromedio = 'desc';
         }
 
         // Ordenamos por promedio y secundariamente por posición de ranking o ID
-        $query->orderBy('promedio_final_cup', $ordenPromedio)
+        // Colocamos promedios NULL al final de forma compatible con múltiples BDs (PostgreSQL/SQLite)
+        $query->orderByRaw('case when promedio_final_cup is null then 1 else 0 end asc')
+            ->orderBy('promedio_final_cup', $ordenPromedio)
             ->orderBy('id', 'asc');
 
         return $query;

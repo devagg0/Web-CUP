@@ -5,7 +5,15 @@ import EstadoAdmisionBadge from './EstadoAdmisionBadge';
 const getCarreraNombre = (carrera) => {
   if (!carrera) return 'Sin carrera';
   if (typeof carrera === 'string') return carrera;
-  if (typeof carrera === 'object') return carrera.nombre ?? carrera.descripcion ?? `Carrera ${carrera.id ?? ''}`;
+  if (typeof carrera === 'object') {
+    return (
+      carrera.nombre ??
+      carrera.descripcion ??
+      carrera.carrera ??
+      carrera.nombre_carrera ??
+      `Carrera ${carrera.id ?? ''}`
+    );
+  }
   return String(carrera);
 };
 

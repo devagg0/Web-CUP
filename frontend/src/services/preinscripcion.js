@@ -60,3 +60,7 @@ export const observarRequisitos = (id, observacion) => api.post(`/admin/preinscr
 export const aprobarPago = (id) => api.post(`/admin/preinscripciones/${id}/aprobar-pago`);
 export const observarPago = (id, observacion) => api.post(`/admin/preinscripciones/${id}/observar-pago`, { observacion });
 export const rechazarPreinscripcion = (id, observacion) => api.post(`/admin/preinscripciones/${id}/rechazar`, { observacion });
+
+// Stripe endpoints
+export const iniciarPagoStripe = (ci, correo) => api.post('/preinscripcion/stripe/checkout', { ci, correo });
+export const confirmarPagoStripe = (sessionId) => api.post('/preinscripcion/stripe/confirmar', { session_id: sessionId });

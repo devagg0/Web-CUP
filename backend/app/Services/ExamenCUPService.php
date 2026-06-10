@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use RuntimeException;
 
@@ -32,6 +33,92 @@ class ExamenCUPService
             'postulantes_cup_aprobados' => $this->contarPostulantesPorEstadoFinal($query, self::ESTADO_FINAL_APROBADO),
             'postulantes_cup_reprobados' => $this->contarPostulantesPorEstadoFinal($query, self::ESTADO_FINAL_REPROBADO),
         ];
+    }
+
+    public function postulantesDisponibles(User $user, ?string $search, ?int $grupoId, ?int $materiaId): Collection
+    {
+        $isDocente = $this->esDocente($user);
+
+        if ($isDocente) {
+            $docente = $this->obtenerDocenteUsuario($user);
+            $asignaciones = AsignacionDocenteGrupo::where('docente_id', $docente->id)
+                ->where('estado', AsignacionDocenteGrupo::ESTADO_ACTIVA)
+                ->get();
+
+            $gruposPermitidos = $asignaciones->pluck('grupo_id');
+            $materiasPermitidas = $asignaciones->pluck('materia_id');
+
+            if ($grupoId && !$gruposPermitidos->contains($grupoId)) {
+                return collect([]);
+            }
+
+            if ($materiaId && !$materiasPermitidas->contains($materiaId)) {
+                return collect([]);
+            }
+
+            $gruposFiltro = $grupoId ? [$grupoId] : $gruposPermitidos->toArray();
+        } else {
+            $gruposFiltro = $grupoId ? [$grupoId] : null;
+        }
+
+        $query = Postulante::query()
+            ->where('estado_preinscripcion', 'INSCRITO');
+
+        if ($gruposFiltro !== null) {
+            $query->whereHas('gruposCup', function ($q) use ($gruposFiltro) {
+                $q->whereIn('grupos_cup.id', $gruposFiltro);
+            });
+        }
+
+        if (!empty($search)) {
+            $searchLower = trim(Str::lower($search));
+            $query->where(function ($q) use ($searchLower) {
+                $q->where(DB::raw('lower(ci)'), 'like', "%{$searchLower}%")
+                  ->orWhere(DB::raw('lower(nombres)'), 'like', "%{$searchLower}%")
+                  ->orWhere(DB::raw('lower(apellidos)'), 'like', "%{$searchLower}%")
+                  ->orWhere(DB::raw('lower(correo)'), 'like', "%{$searchLower}%");
+
+                $driver = DB::connection()->getDriverName();
+                if ($driver === 'sqlite') {
+                    $q->orWhere(DB::raw("lower(nombres || ' ' || apellidos)"), 'like', "%{$searchLower}%");
+                } else {
+                    $q->orWhere(DB::raw("lower(concat(nombres, ' ', apellidos))"), 'like', "%{$searchLower}%");
+                }
+
+                if (Schema::hasColumn('postulantes', 'nombre')) {
+                    $q->orWhere(DB::raw('lower(nombre)'), 'like', "%{$searchLower}%");
+                }
+                if (Schema::hasColumn('postulantes', 'apellido')) {
+                    $q->orWhere(DB::raw('lower(apellido)'), 'like', "%{$searchLower}%");
+                }
+                if (Schema::hasColumn('postulantes', 'email')) {
+                    $q->orWhere(DB::raw('lower(email)'), 'like', "%{$searchLower}%");
+                }
+
+                $q->orWhereHas('user', function ($uq) use ($searchLower) {
+                    $uq->where(DB::raw('lower(email)'), 'like', "%{$searchLower}%");
+                    if (Schema::hasColumn('users', 'correo')) {
+                        $uq->orWhere(DB::raw('lower(correo)'), 'like', "%{$searchLower}%");
+                    }
+                });
+            });
+        }
+
+        return $query->with('gruposCup')->get()->map(function (Postulante $p) {
+            $grupo = $p->gruposCup->first();
+            return [
+                'id' => $p->id,
+                'ci' => $p->ci,
+                'nombre_completo' => trim($p->nombres . ' ' . $p->apellidos),
+                'correo' => $p->correo,
+                'estado' => $p->estado_preinscripcion,
+                'grupo' => $grupo ? [
+                    'id' => $grupo->id,
+                    'codigo' => $grupo->codigo,
+                    'nombre' => $grupo->nombre,
+                ] : null,
+            ];
+        });
     }
 
     public function queryVisibleParaUsuario(User $user)
@@ -236,7 +323,7 @@ class ExamenCUPService
             'parcial_2' => $parcial2,
             'parcial_3' => $parcial3,
             'nota_final' => $notaFinal,
-            'estado_materia' => ExamenCUP::estadoMateria($notaFinal),
+            'estado_materia' => ExamenCUP::estadoMateria($parcial1, $parcial2, $parcial3, $notaFinal),
         ];
     }
 

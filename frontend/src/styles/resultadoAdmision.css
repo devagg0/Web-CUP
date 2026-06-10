@@ -1,0 +1,317 @@
+.resultado-admision-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.resultado-container {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.resultado-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.resultado-header h2 {
+  font-size: 26px;
+  font-weight: 800;
+  color: #003B73;
+  margin-bottom: 8px;
+}
+
+.resultado-header p {
+  color: #64748b;
+  font-size: 15px;
+}
+
+/* Card Principal con el Mensaje Grande */
+.resultado-card-main {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+  padding: 32px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  transition: transform 0.2s ease;
+}
+
+.resultado-card-main:hover {
+  transform: translateY(-2px);
+}
+
+/* Clases según el estado */
+.resultado-card-main.admitido_primera_opcion {
+  border-top: 6px solid #16a34a;
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+}
+
+.resultado-card-main.admitido_segunda_opcion {
+  border-top: 6px solid #1d4ed8;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+}
+
+.resultado-card-main.aprobado_sin_cupo {
+  border-top: 6px solid #d97706;
+  background: linear-gradient(180deg, #fef3c7 0%, #ffffff 100%);
+}
+
+.resultado-card-main.reprobado {
+  border-top: 6px solid #dc2626;
+  background: linear-gradient(180deg, #fee2e2 0%, #ffffff 100%);
+}
+
+.resultado-card-main.pendiente {
+  border-top: 6px solid #64748b;
+  background: linear-gradient(180deg, #f1f5f9 0%, #ffffff 100%);
+}
+
+.resultado-mensaje {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+
+/* Badges y estilización */
+.resultado-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-admitido-primera {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.badge-admitido-segunda {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-aprobado-sin-cupo {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.badge-reprobado {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-pendiente {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+/* Estadísticas rápidas */
+.resultado-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.resultado-stat-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.resultado-stat-label {
+  display: block;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.05em;
+}
+
+.resultado-stat-value {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f766e;
+}
+
+/* Secciones de Información */
+.resultado-details-section {
+  background: #ffffff;
+  border: 1px solid #e5edf5;
+  border-radius: 12px;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.resultado-section-title {
+  color: #003B73;
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 18px 0;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+}
+
+/* Grid de datos */
+.resultado-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.resultado-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.resultado-info-item.full-width {
+  grid-column: span 2;
+}
+
+.resultado-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.resultado-value {
+  font-size: 15px;
+  color: #1e293b;
+  font-weight: 700;
+}
+
+.resultado-value.highlight {
+  color: #003B73;
+}
+
+.resultado-value.observacion {
+  font-style: italic;
+  font-weight: normal;
+  color: #475569;
+  line-height: 1.5;
+}
+
+/* Acciones en vista principal */
+.resultado-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Estilos de Impresión */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .app-sidebar,
+  .sidebar,
+  .sidebar-nav,
+  .app-header,
+  .main-content > header,
+  .resultado-actions,
+  button,
+  .heading-actions,
+  .sidebar-footer {
+    display: none !important;
+  }
+
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .content-inner {
+    padding: 0 !important;
+  }
+
+  .resultado-container {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 20px !important;
+  }
+
+  .resultado-card-main {
+    box-shadow: none !important;
+    border: 2px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  .resultado-details-section {
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    page-break-inside: avoid;
+  }
+
+  /* Mostrar un encabezado formal en la impresión */
+  .resultado-print-header {
+    display: block !important;
+    text-align: center;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+  }
+
+  .resultado-print-header h1 {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  .resultado-print-header p {
+    font-size: 12px;
+    margin: 4px 0 0;
+  }
+}
+
+/* Encabezado oculto por defecto, solo visible en impresión */
+.resultado-print-header {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .resultado-grid {
+    grid-template-columns: 1fr;
+  }
+  .resultado-info-item.full-width {
+    grid-column: span 1;
+  }
+  .resultado-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}

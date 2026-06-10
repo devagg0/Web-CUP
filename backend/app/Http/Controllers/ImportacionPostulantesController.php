@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Postulante;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Carrera;
 use App\Services\PostulanteAccountService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -68,8 +71,36 @@ class ImportacionPostulantesController extends Controller
             ], 422);
         }
 
+        // Cache role and active carreras
+        $rolPostulante = Role::where('nombre', 'postulante')->first();
+        $rolPostulanteId = $rolPostulante ? $rolPostulante->id : null;
+        $carrerasIds = Carrera::pluck('id')->toArray();
+
+        // Cache existing CIs and emails for fast memory checks
+        $existingCis = array_fill_keys(Postulante::pluck('ci')->map(fn($val) => (string)$val)->toArray(), true);
+        $existingPostulanteCorreos = array_fill_keys(Postulante::pluck('correo')->map(fn($val) => strtolower((string)$val))->toArray(), true);
+        $existingUserEmails = array_fill_keys(User::pluck('email')->map(fn($val) => strtolower((string)$val))->toArray(), true);
+
+        // Pre-calculate sequential registration number
+        $queryRegistro = DB::table('users')
+            ->whereNotNull('registro');
+
+        if (DB::getDriverName() === 'sqlite') {
+            $maxRegistro = $queryRegistro
+                ->orderByRaw('CAST(registro AS INTEGER) DESC')
+                ->value('registro');
+        } else {
+            $maxRegistro = $queryRegistro
+                ->whereRaw("registro ~ '^[0-9]+$'")
+                ->orderByRaw('CAST(registro AS BIGINT) DESC')
+                ->value('registro');
+        }
+
+        $siguienteRegistro = $maxRegistro ? ((int) $maxRegistro) + 1 : 219051216;
+
         $totalFilas = 0;
         $creados = [];
+        $omitidos = [];
         $errores = [];
         $ciLeidos = [];
         $correosLeidos = [];
@@ -84,18 +115,43 @@ class ImportacionPostulantesController extends Controller
 
             $totalFilas++;
             $data = $this->normalizarFila($headers, $row);
-            $erroresDuplicadosArchivo = $this->validarDuplicadosEnArchivo($data, $ciLeidos, $correosLeidos);
-            $validator = Validator::make($data, $this->reglasValidacion());
-            $erroresFila = array_merge($erroresDuplicadosArchivo, $validator->errors()->all());
+            $ci = $data['ci'] ?? null;
+            $correo = $data['correo'] ?? null;
 
-            if ($erroresFila !== []) {
-                $errores[] = $this->errorFila($numeroFila, $data, implode(' ', $erroresFila));
+            // 1. Detect duplicates before creating (check files and DB)
+            $erroresDuplicadosArchivo = $this->validarDuplicadosEnArchivo($data, $ciLeidos, $correosLeidos);
+            $esDuplicadoDb = false;
+            if ($ci && isset($existingCis[$ci])) {
+                $esDuplicadoDb = true;
+            }
+            if ($correo && (isset($existingPostulanteCorreos[$correo]) || isset($existingUserEmails[$correo]))) {
+                $esDuplicadoDb = true;
+            }
+
+            if (!empty($erroresDuplicadosArchivo) || $esDuplicadoDb) {
+                $motivo = !empty($erroresDuplicadosArchivo) ? implode(' ', $erroresDuplicadosArchivo) : 'El postulante (CI o correo) ya está registrado en el sistema.';
+                $omitidos[] = [
+                    'fila' => $numeroFila,
+                    'ci' => $ci,
+                    'correo' => $correo,
+                    'motivo' => $motivo,
+                ];
                 $this->registrarLeidos($data, $ciLeidos, $correosLeidos);
                 continue;
             }
 
+            // 2. Validate structural data
+            $validator = Validator::make($data, $this->reglasValidacion($carrerasIds));
+            if ($validator->fails()) {
+                $errores[] = $this->errorFila($numeroFila, $data, implode(' ', $validator->errors()->all()));
+                $this->registrarLeidos($data, $ciLeidos, $correosLeidos);
+                continue;
+            }
+
+            // 3. Insert applicant and account atomically
             try {
-                $credenciales = DB::transaction(function () use ($data) {
+                $registroStr = (string)$siguienteRegistro;
+                $credenciales = DB::transaction(function () use ($data, $rolPostulanteId, $registroStr) {
                     $postulante = Postulante::create([
                         'user_id' => null,
                         'ci' => $data['ci'],
@@ -115,22 +171,30 @@ class ImportacionPostulantesController extends Controller
                         'fecha_aprobacion' => now()->toDateString(),
                     ]);
 
-                    return $this->accountService->crearCuentaPostulante($postulante);
+                    return $this->accountService->crearCuentaPostulante($postulante, [
+                        'enviar_correo' => false,
+                        'role_id' => $rolPostulanteId,
+                        'registro' => $registroStr,
+                    ]);
                 });
 
-                $creado = [
-                    'fila' => $numeroFila,
+                $siguienteRegistro++;
+
+                // Register CI/correo in the memory sets to prevent subsequent duplicates
+                if ($ci) {
+                    $existingCis[$ci] = true;
+                }
+                if ($correo) {
+                    $existingPostulanteCorreos[$correo] = true;
+                    $existingUserEmails[$correo] = true;
+                }
+
+                $creados[] = [
                     'ci' => $data['ci'],
                     'correo' => $data['correo'],
                     'registro' => $credenciales['registro'],
                     'password_temporal' => $credenciales['password_temporal'],
                 ];
-
-                if ($credenciales['correo_error']) {
-                    $creado['correo_error'] = $credenciales['correo_error'];
-                }
-
-                $creados[] = $creado;
             } catch (\Throwable $exception) {
                 $errores[] = $this->errorFila($numeroFila, $data, $exception->getMessage());
             }
@@ -141,21 +205,24 @@ class ImportacionPostulantesController extends Controller
         fclose($handle);
 
         return response()->json([
-            'message' => 'Importación finalizada',
-            'resumen' => [
-                'total_filas' => $totalFilas,
-                'creados' => count($creados),
-                'omitidos' => count($errores),
-            ],
-            'errores' => $errores,
-            'creados' => $creados,
+            'success' => true,
+            'message' => 'Importación procesada correctamente',
+            'total_filas' => $totalFilas,
+            'creados' => count($creados),
+            'omitidos' => count($omitidos),
+            'errores' => count($errores),
+            'correos_enviados' => 0,
+            'envio_correos' => false,
+            'postulantes_creados' => $creados,
+            'postulantes_omitidos' => $omitidos,
+            'errores_detalle' => $errores,
         ]);
     }
 
-    private function reglasValidacion(): array
+    private function reglasValidacion(array $carrerasIds): array
     {
         return [
-            'ci' => ['required', 'string', 'max:20', Rule::unique('postulantes', 'ci')],
+            'ci' => ['required', 'string', 'max:20'],
             'nombres' => ['required', 'string', 'max:100'],
             'apellidos' => ['required', 'string', 'max:100'],
             'fecha_nacimiento' => ['required', 'date'],
@@ -166,16 +233,14 @@ class ImportacionPostulantesController extends Controller
                 'required',
                 'email',
                 'max:150',
-                Rule::unique('postulantes', 'correo'),
-                Rule::unique('users', 'email'),
             ],
             'colegio_procedencia' => ['required', 'string', 'max:150'],
             'ciudad' => ['required', 'string', 'max:100'],
-            'primera_carrera_id' => ['required', 'integer', Rule::exists('carreras', 'id')],
+            'primera_carrera_id' => ['required', 'integer', Rule::in($carrerasIds)],
             'segunda_carrera_id' => [
                 'required',
                 'integer',
-                Rule::exists('carreras', 'id'),
+                Rule::in($carrerasIds),
                 'different:primera_carrera_id',
             ],
             'estado' => ['required', 'string', Rule::in(['INSCRITO'])],

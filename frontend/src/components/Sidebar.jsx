@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound, UserCheck, CalendarCheck, Clock, Trophy } from 'lucide-react';
+import { Users, Grid, BookOpen, Layers, ClipboardList, GraduationCap, UserRound, UsersRound, UserCheck, CalendarCheck, Clock, Trophy, BarChart3, LayoutDashboard } from 'lucide-react';
 import escudo from '../assets/escudo-ficct.png';
 
 export default function Sidebar() {
@@ -12,6 +12,8 @@ export default function Sidebar() {
   const canViewCargaHorariaAulas = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
   const canViewEvaluacionesNotas = ['admin', 'administrador', 'coordinador', 'docente', 'autoridad'].includes(role);
   const canViewAdmisionesCup = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
+  const canViewReportesAcademicos = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
+  const canViewDashboardAdmin = ['admin', 'administrador', 'coordinador', 'autoridad'].includes(role);
 
   return (
     <aside className="app-sidebar">
@@ -27,6 +29,11 @@ export default function Sidebar() {
         <NavLink to="/dashboard" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <Grid size={18} /> <span>Dashboard</span>
         </NavLink>
+        {canViewDashboardAdmin && (
+          <NavLink to="/dashboard-admin" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <LayoutDashboard size={18} /> <span>Panel Administrativo</span>
+          </NavLink>
+        )}
         {user?.role === 'admin' && (
           <>
             <NavLink to="/usuarios" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
@@ -76,6 +83,11 @@ export default function Sidebar() {
             <Trophy size={18} /> <span>Admisión por cupos</span>
           </NavLink>
         )}
+        {canViewReportesAcademicos && (
+          <NavLink to="/reportes-academicos" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <BarChart3 size={18} /> <span>Reportes académicos</span>
+          </NavLink>
+        )}
         {role === 'docente' && (
           <NavLink to="/docente/mi-perfil" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <UserRound size={18} /> <span>Mi perfil docente</span>
@@ -104,6 +116,11 @@ export default function Sidebar() {
         {role === 'postulante' && (
           <NavLink to="/postulante/mis-notas" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <GraduationCap size={18} /> <span>Mis notas</span>
+          </NavLink>
+        )}
+        {role === 'postulante' && (
+          <NavLink to="/postulante/resultado-admision" className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <Trophy size={18} /> <span>Resultado de admisión</span>
           </NavLink>
         )}
       </nav>

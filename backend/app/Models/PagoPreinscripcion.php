@@ -18,6 +18,10 @@ class PagoPreinscripcion extends Model
         'comprobante_path',
         'estado',
         'observacion',
+        'stripe_session_id',
+        'stripe_payment_intent_id',
+        'metodo_pago',
+        'fecha_pago',
     ];
 
     protected $appends = ['comprobante_url'];

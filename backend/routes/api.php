@@ -16,12 +16,18 @@ use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\PreinscripcionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdmisionCUPController;
+use App\Http\Controllers\ResultadoAdmisionController;
+use App\Http\Controllers\ReporteAcademicoController;
+use App\Http\Controllers\DashboardCupController;
+use App\Http\Controllers\StripePaymentController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/preinscripcion', [PreinscripcionController::class, 'store']);
 Route::post('/preinscripcion/consultar', [PreinscripcionController::class, 'consultar']);
 Route::post('/preinscripcion/pago', [PreinscripcionController::class, 'pago']);
+Route::post('/preinscripcion/stripe/checkout', [StripePaymentController::class, 'checkout']);
+Route::post('/preinscripcion/stripe/confirmar', [StripePaymentController::class, 'confirmar']);
 Route::get('/preinscripcion/carreras-activas', [PreinscripcionController::class, 'carrerasActivas']);
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -88,10 +94,23 @@ Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autorid
 
     Route::get('/admin/asistencias-docente', [AsistenciaDocenteController::class, 'adminIndex']);
     Route::get('/admin/asistencias-docente/{asistencia}', [AsistenciaDocenteController::class, 'show']);
+
+    // Rutas de Reportes Académicos
+    Route::get('/admin/reportes-academicos/resumen', [ReporteAcademicoController::class, 'resumen']);
+    Route::get('/admin/reportes-academicos/lista-general-postulantes', [ReporteAcademicoController::class, 'listaGeneralPostulantes']);
+    Route::get('/admin/reportes-academicos/postulantes-aprobados', [ReporteAcademicoController::class, 'postulantesAprobados']);
+    Route::get('/admin/reportes-academicos/postulantes-reprobados', [ReporteAcademicoController::class, 'postulantesReprobados']);
+    Route::get('/admin/reportes-academicos/promedios-generales', [ReporteAcademicoController::class, 'promediosGenerales']);
+    Route::get('/admin/reportes-academicos/grupos-habilitados', [ReporteAcademicoController::class, 'gruposHabilitados']);
+    Route::get('/admin/reportes-academicos/estadisticas-materia', [ReporteAcademicoController::class, 'estadisticasMateria']);
+    Route::get('/admin/reportes-academicos/docentes-por-grupo', [ReporteAcademicoController::class, 'docentesPorGrupo']);
+    Route::get('/admin/reportes-academicos/grupos-mayor-aprobados', [ReporteAcademicoController::class, 'gruposMayorAprobados']);
+    Route::get('/admin/reportes-academicos/exportar-pdf', [ReporteAcademicoController::class, 'exportarPdf']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad,docente'])->group(function () {
     Route::get('/admin/examenes-cup/resumen', [ExamenCUPController::class, 'resumen']);
+    Route::get('/admin/examenes-cup/postulantes-disponibles', [ExamenCUPController::class, 'postulantesDisponibles']);
     Route::get('/admin/examenes-cup', [ExamenCUPController::class, 'index']);
     Route::get('/admin/examenes-cup/{postulante}', [ExamenCUPController::class, 'showByPostulante']);
     Route::post('/admin/examenes-cup', [ExamenCUPController::class, 'store']);
@@ -156,6 +175,7 @@ Route::middleware(['auth:sanctum', 'role:docente'])->group(function () {
 Route::middleware(['auth:sanctum', 'role:postulante'])->group(function () {
     Route::get('/postulante/mi-grupo-horario', [GrupoHorarioController::class, 'miGrupoHorario']);
     Route::get('/postulante/mis-notas-cup', [ExamenCUPController::class, 'misNotasCup']);
+    Route::get('/postulante/mi-resultado-admision', [ResultadoAdmisionController::class, 'miResultadoAdmision']);
 });
 
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad'])->group(function () {
@@ -167,6 +187,11 @@ Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autorid
 Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador'])->group(function () {
     Route::post('/admin/admisiones-cup/procesar', [AdmisionCUPController::class, 'procesar']);
     Route::post('/admin/admisiones-cup/reprocesar', [AdmisionCUPController::class, 'reprocesar']);
+});
+
+// CU18 — Panel Administrativo CUP (solo lectura)
+Route::middleware(['auth:sanctum', 'role:admin,administrador,coordinador,autoridad'])->group(function () {
+    Route::get('/admin/dashboard-cup/resumen', [DashboardCupController::class, 'resumen']);
 });
 
 Route::get('/ping', function () {

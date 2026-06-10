@@ -362,7 +362,7 @@ class PreinscripcionController extends Controller
             ], 422);
         }
 
-        if (! $postulante->pago || ! $postulante->pago->comprobante_path) {
+        if (! $postulante->pago || (! $postulante->pago->comprobante_path && $postulante->pago->metodo_pago !== 'STRIPE')) {
             return response()->json([
                 'message' => 'No existe comprobante de pago para esta preinscripción.',
             ], 422);

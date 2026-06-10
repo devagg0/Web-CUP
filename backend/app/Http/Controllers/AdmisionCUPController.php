@@ -32,7 +32,8 @@ class AdmisionCUPController extends Controller
     {
         $query = $this->admisionService->queryConFiltros($request);
 
-        $admisiones = $query->paginate(10);
+        $perPage = $request->input('per_page', 10);
+        $admisiones = $query->paginate($perPage);
 
         $admisiones->getCollection()->transform(
             fn (AdmisionCUP $admision) => $this->admisionService->transform($admision)
